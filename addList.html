@@ -1,0 +1,1561 @@
+<!doctype html><html lang="en">
+
+<head>
+<title>tcheckovsky</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+<style id="demoStyles">
+
+@font-face {
+    font-family : luckiest;
+    src : url(luckiest.ttf);
+}
+
+* {
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    
+    --nose-hsla: hsla(20, 40%, 100%, 0);
+    --nose-h: 20;
+    --nose-s: 40%;
+    --nose-l: 100%;
+    --nose-a: 0;
+    
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #666;
+    font-size: 22px;
+    text-align: justify;
+    hyphens: auto;
+        
+    --lightness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        var(--nose-l)
+    );
+    
+    --midness: hsl(
+        var(--nose-h),
+        calc(0.5 * var(--nose-s)),
+        calc(0.5 * var(--nose-l))
+    );
+    
+    --darkness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.35 * var(--nose-l))
+    );
+    
+    --blackness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.20 * var(--nose-l))
+    );
+                
+    --main-color: var(--lightness);
+    --greyed-out: var(--darkness);
+    --back-color: #666;
+    --holder-back: #111;
+    
+    --trans-speed: 0.3s;
+
+    /* !!!MUST have spaces between -'s !!!
+    calc((var(--nose-l) - 30%)/(.8 - .3)) */
+    
+}
+
+.holder {
+	position: relative;
+    color: var(--main-color);
+    background-color: var(--holder-back);
+    margin: auto;
+    width: 100%;
+    max-width: 700px;
+    user-select: none;
+    touch-action: none;
+}
+
+a {
+    text-decoration: none;
+    color: var(--darkness);
+}
+
+a:hover, a:visited {
+    transition: color linear var(--trans-speed);
+    color: var(--darkness);
+}
+
+.qa > div > a, .qa > div  > a,
+.qb > div > a, .qb > div  > a,
+.qa > div > a:hover, .qa > div  > a:visited,
+.qb > div > a:hover, .qb > div> a:visited
+{
+    color: var(--lightness);
+}
+
+.qr > b {
+    color: var(--darkness);
+}
+
+.qa > div > b,
+.qb > div > b {
+    color: var(--lightness);
+}
+
+pre {
+    background-color: var(--midness);
+    margin: 0px;
+    padding: 10px;
+    color: var(--lightness);
+    overflow: auto;
+}
+
+hr {
+    border-top: 1px solid var(--blackness);
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    margin: 7px 0px 7px 0px;
+}
+
+.qr {
+    padding: 10px;
+}
+
+.qa:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.qa > div {
+    float: left;
+    padding: 10px;
+    height: auto;
+}
+
+.qa > div:nth-child(1) {
+  width: 65%;
+}
+
+.qa > div:nth-child(2) {
+  width: 35%;
+}
+
+.qb:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.qb > div {
+    float: left;
+    padding: 10px;
+    height: auto;
+}
+
+.qb > div:nth-child(1) {
+  width: 35%;
+}
+
+.qb > div:nth-child(2) {
+  width: 65%;
+}
+
+.qa, .qb {
+    color: var(--midness);
+}
+
+.mobr {
+    display: none;
+}
+
+.hobr {
+    display: inline-block;
+}
+
+.abhr {
+    display: none;
+}
+
+/*possibly a portrait mobi-fone*/
+@media screen and (max-width:500px) {
+
+	.qa > div:nth-child(1),
+	.qa > div:nth-child(2),
+	.qb > div:nth-child(1),
+	.qb > div:nth-child(2)
+	{
+    	width: 100%;
+    }
+    
+    .mobr {
+        display: inline-block;
+    }
+    .hobr {
+        display: none;
+    }
+    .abhr {
+        display: block;
+    }
+    ul {
+        text-align: left;
+    }
+    
+    #title {
+        font-size: 20px;
+    }
+
+}
+
+/*possibly a mobile landscraper*/
+@media screen and (orientation: landscape) and (max-width: 760px) {
+    
+}
+
+.signature {
+    text-align: right;
+    font-family: 'luckiest';
+    font-style: italic;
+    height: 200px;
+    -webkit-text-stroke: 1px var(--darkness);
+    color: var(--midness);
+    user-select: none;
+}
+
+
+</style>
+<style id="czechStyles">
+
+#title {
+    font-family: luckiest;
+    font-size: 40px;
+    text-align: center;
+    -webkit-text-stroke: 2px var(--darkness);
+    color: var(--midness);
+    transition: font-size ease-in 1500ms;
+}
+
+[data-czech] {
+    position: relative;
+    height: 52px;
+    padding-left: 68px;
+    margin-top: 20px;
+    width: 100%;
+    user-select: none;
+}
+
+svg {
+    --linesize: 4px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 50px;
+    width: 50px;
+    display: block;
+    float: left;
+    z-index: 200;
+    isolation: isolate;
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+}
+
+path {
+    xfill: none;
+    fill: var(--lightness, #f0f);
+    stroke: none;
+    xstroke-width: var(--linesize);
+    xstroke-linecap: round;
+    xstroke: var(--lightness, #f0f);
+    transition: opacity linear 400ms;
+}
+
+#pad > path {
+    xstroke: none;
+    xfill: url(#svgGrad);
+    stroke-width: 1;
+    stroke: var(--lightness);
+    fill: var(--lightness);
+}
+
+#ratPath {
+    stroke: var(--lightness);
+    stroke-width: 0px;
+    marker-start: url(#dot);
+    marker-mid: url(#dot);
+    marker-end: url(#dot);
+}
+
+#ratLips {
+    display: none;
+    fill: none;
+    stroke: var(--midness);
+    stroke-width: 10px;
+    cx: 100;
+    cy: 100;
+    rx: 2;
+    ry: 2;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+#ratLine {
+    fill: none;
+    --dotdot-color: #ea0;
+    stroke: rgba(255,255,2550.5):
+    --linesize: 0.25px;
+    stroke-width: 0.2px;
+    marker-start: url(#dotQ);
+    marker-mid: url(#dotQ);
+    marker-end: url(#dotQ);
+}
+
+#addInput {
+    height:50px;
+    min-width: 0;
+    font-size: 100%;
+    font-style: italic;
+    color: var(--lightness);
+    background-color: var(--darkness);
+    flex: 0 1 calc(100% - 80px);
+    margin-right: 10px;
+}
+
+#addInput::placeholder {
+    
+    text-align: center;
+    font-style: italic;
+    color: #fff;
+    opacity: 0.25;
+    
+}
+
+#addBox {
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    height: 50px;
+    width: 80px;
+    font-family: luckiest;
+    -webkit-text-stroke: 2px var(--midness);
+    color: var(--blackness);
+    background-color: var(--darkness);
+    line-height: 60px;
+    font-size: 50px;
+    flex: 0 0 80px;
+    min-width: 0;
+}
+
+.box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    margin-left:10px;
+    border: 1px solid var(--darkness);
+    background-color: var(--midness);
+    transition: all linear 400ms;
+}
+
+.completed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 1px solid var(--darkness);
+    background-color: var(--blackness);
+    transform: rotate(-360deg);
+    text-align: center;
+    font-size: 20px;
+    line-height: 50px;
+}
+
+.box > svg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: none"
+    overflow: visible;
+}
+
+.box > svg > path {
+    
+    d:path('M 14 17 L 22 33 Q 27 10 38 -8 L 44 2 Q 32 15.25 23.25 46 Q 14 37 9 27 Z');
+    
+    vector-effect: non-scaling-stroke;
+    stroke-width: 5px;
+    stroke: var(--lightness);
+    stroke-linecap: round;
+    fill: none;
+    stroke: none;
+    fill: var(--lightness);
+    opacity: 0;
+    transition: opacity linear 400ms;
+    
+}
+
+.titleArrow {
+    display: inline-block;
+    transform: rotate(0deg);
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    background-color: var(--darkness);
+    height: 17.32px;
+    width: 20px;
+    vertical-align: middle;
+    transform-origin: 50% 25%;
+    transition: transform linear 300ms;
+    
+}
+
+#title:hover .titleArrow.left {
+    transform: rotate(180deg) translateY(-5px);
+}
+
+#title:hover .titleArrow.rite {
+    transform: rotate(-180deg) translateY(-5px);
+}
+
+/*possibly a mobile landscraper*/
+@media screen and (orientation: landscape) and (max-width: 760px) {
+
+    
+}
+    
+</style>
+<script defer src="nanopicker.js"></script>
+</head>
+
+<body>
+<div id="hold0" class="holder">
+    
+    <div id="title" class="qr">
+    <div class="titleArrow left"></div>
+    tczekov
+    <div class="titleArrow rite"></div>
+    </div>
+    
+    <div id="notes" class="qr" style="
+        font-size:20px;
+        text-align:center;
+        padding: 0;
+    ">
+        skry drawing each editing symbol;
+        double-click to reactivate
+    </div>
+    
+    <div>
+    <div id="addArea" class="qr"
+    style="
+        display:flex;
+    "
+    >
+        <input id="addInput"
+         placeholder="... add item"
+         type="text">
+        <input id="addBox" type="button" value="+">
+    </div>
+    </div>
+    
+    <br>
+    <hr>
+    <div class="qr signature">~queviva</div>
+    
+</div>
+<div svgdiv ><svg viewbox="0 0 50 50">
+    <defs>
+        <marker id="dot" refX="10" refY="10"
+         vector-effect="non-scaling-size"
+         markerUnits="userSpaceOnUse"
+         markerWidth="20"
+         markerHeight="20"
+         orient="auto"
+        >
+            <circle id="dotdot" cx="10" cy="10" r="3"
+             vector-effect="non-scaling-size"
+             fill="#c30"
+             stroke="none"
+            ></circle>
+        </marker>
+        <marker id="dotQ" refX="10" refY="10"
+         vector-effect="non-scaling-size"
+         markerUnits="userSpaceOnUse"
+         markerWidth="20"
+         markerHeight="20"
+         orient="auto"
+        >
+            <circle id="dotdotQ" cx="10" cy="10" r="4"
+             vector-effect="non-scaling-size"
+             fill="#ea0"
+             stroke="none"
+            ></circle>
+        </marker>
+        <linearGradient id="svgGrad"
+        gradientTransform="rotate(40)"
+        >
+        <stop offset="0%" stop-color="#c30" />
+        <stop offset="80%" stop-color="#fb0" />
+        </linearGradient>
+    </defs>
+    <g>
+        <ellipse id="ratLips"/>
+        <path id="ratLine" />
+        <path id="ratPath" />
+    </g>
+    <g id="pad"></g>
+</svg></div>
+</body>
+
+<script>
+////////////////////////////////////////////////////////{
+// pizzaface
+//
+const log = console.log;
+const fix = (...v) => console.log(v.map(x =>
+    typeof x === 'number' ? x.toFixed(1) :
+    typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
+).join(' '));
+////////////////////////////////////////////////////////}
+
+new function() {
+    
+// prefs {
+
+const prefs = {
+    useDrawnMark : false,
+    minSize : 10,
+    maxSize : 150,
+    penWidth : 10,
+    //penTheta : -0.46, //radians
+    penTheta : -0.2,
+    rat: 'master'
+};
+    
+//}
+
+// constants {
+
+const NS = 'http://www.w3.org/2000/svg';
+const addLiz = document.addEventListener;
+const remLiz = document.removeEventListener;
+const svg = document.getElementById('pad');
+let waiting = false;
+let compList = [];
+let coordList = [];
+const pi180 = 180 / Math.PI;
+const perc = v => Math.round(v*100) + '%';
+const min = Math.min;
+const max = Math.max;
+const abs = Math.abs;
+const cos = Math.cos;
+const sin = Math.sin;
+const tan = Math.tan;
+const sqrt = Math.sqrt;
+const sign = Math.sign;
+const atan = Math.atan;
+const rand = Math.random;
+const atan2 = Math.atan2;
+
+const xtra = cos(prefs.penTheta) * prefs.penWidth;
+const ytra = sin(prefs.penTheta) * prefs.penWidth;
+
+
+//}
+
+// point object {
+
+let pointCount = 0;
+
+function Point (x, y) {
+    
+    this.x = x;
+    this.y = y;
+    
+    let wid = ( 11 +
+       5 * sin((pointCount += 0.2))
+    );
+    wid = prefs.penWidth;
+    
+    let xxx = cos(prefs.penTheta) * wid;
+    let yyy = sin(prefs.penTheta) * wid;
+    
+    this.rite = { 'x': x + xxx, 'y': y + yyy };
+    this.left = { 'x': x - xxx, 'y': y - yyy };
+    
+    this.RtoL = this.rite.x +' '+ this.rite.y + 'L' +
+                this.left.x +' '+ this.left.y;
+    this.LtoR = this.left.x +' '+ this.left.y + 'L' +
+                this.rite.x +' '+ this.rite.y;
+                
+}
+Point
+    
+//}
+
+// line object {
+    
+function LineObj (d) {
+
+    // turn all the numbers into numbers
+    let N = d.match(/[\d\.-]+/g).map(v => Number(v));
+
+    let XXX = N.filter((_, i) => i % 2 === 0);
+    let YYY = N.filter((_, i) => i % 2 === 1);
+
+    this.coor = [[XXX[0], YYY[0]]];
+
+    XXX.slice(2, -1).forEach((_, i) => {
+
+        if (
+               XXX[i + 2] !== XXX[i + 1]
+            && YYY[i + 2] !== YYY[i + 1]
+
+        ) {
+            this.coor.push([XXX[i + 1], YYY[i + 1]]);
+        }
+
+    });
+
+    this.coor.push([XXX.at(-1), YYY.at(-1)]);
+
+    this.XXX = this.coor.map(c => c[0]);
+    this.YYY = this.coor.map(c => c[1]);
+    this.xMin = min(...this.XXX);
+    this.yMin = min(...this.YYY);
+    this.xMax = max(...this.XXX);
+    this.yMax = max(...this.YYY);
+    this.wide = this.xMax - this.xMin;
+    this.high = this.yMax - this.yMin;
+
+}
+
+LineObj.prototype.getTurns = function (filt = false) {
+
+    this.turns = {};
+    
+    let T = [
+
+        this.XXX.slice(1).map((x, i) =>
+            [sign(x - this.XXX[i]), i]
+        ).filter(v => v[0] !== 0),
+
+        this.YYY.slice(1).map((y, i) =>
+            [sign(y - this.YYY[i]), i]
+        ).filter(v => v[0] !== 0)
+
+    ];
+    
+    T = T.map(t =>
+        t.slice(1).filter((v, i) => v[0] !== t[i][0])
+    );
+    
+    T.forEach((t, i) => {
+        
+        this.turns[['xPts','yPts'][i]] = t.map(v =>
+            [this.XXX[v[1]], this.YYY[v[1]], v[1]]
+        );
+        
+        if (filt) {
+            
+            this.turns[['xPts', 'yPts'][i]] =
+            this.turns[['xPts', 'yPts'][i]].filter(t => {
+                return t[2] > 5 || (
+                    abs(this.XXX[0] - t[0]) > 5 ||
+                    abs(this.YYY[0] - t[1]) > 10
+                    )
+            });
+            
+        }
+        
+        this.turns[['x','y'][i]] =
+        this.turns[['xPts', 'yPts'][i]].length;
+        
+    });
+    
+    return this;
+
+};
+
+LineObj.prototype.getClocks = function () {
+    
+    this.clocks = this.XXX.slice(2).map((_, i) => {
+
+        let val =
+            (this.YYY[i + 1] - this.YYY[i]) *
+            (this.XXX[i + 2] - this.XXX[i + 1]) -
+            (this.XXX[i + 1] - this.XXX[i]) *
+            (this.YYY[i + 2] - this.YYY[i + 1]);
+
+        return val === 0 ? 0 : val > 0 ? 1 : -1
+
+    });
+    
+    return this;
+
+};
+
+LineObj.prototype.getSlopes = function () {
+    
+    this.slopes = {
+    
+        val: this.XXX.slice(1).map((_, i) =>
+             (this.YYY[i] - this.YYY[i + 1]) /
+             (this.XXX[i] - this.XXX[i + 1])
+        ),
+    
+        all: (this.YYY.at(-1) - this.YYY[0]) /
+             (this.XXX.at(-1) - this.XXX[0])
+    }
+    
+    this.slopes.ave = this.slopes.val.reduce((a,b)=>a+b,0)/
+                      this.slopes.val.length;
+    
+    this.slopes.err = this.slopes.val.map(v =>
+        abs(this.slopes.ave - v)
+    );
+    
+    return this;
+    
+};
+
+LineObj.prototype.makeSVG = function () {
+    
+    this.svg = 'M'+ this.coor[0][0] +
+               ' '+ this.coor[0][1];
+        
+    this.coor.slice(1).forEach((_, i) => {
+    
+        this.svg += 'L' + this.coor[i + 1][0] +
+                    ' ' + this.coor[i + 1][1]
+    });
+    
+    return this;
+    
+};
+
+//}
+
+// tczech object {
+
+function Tczech (CZ) {
+    
+    this.CZ = CZ;
+    this.divS = CZ.style;
+
+    this.test = tests[CZ.dataset['czech'] || 'non'];
+
+    this.completed = false;
+
+    this.box = document.createElement('div');
+    this.box.classList.add('box');
+    this.box.innerHTML =
+        `<svg viewbox="0 0 50 50"><path/></svg>`;
+
+    this.svg = this.box.childNodes[0];
+    this.check = this.svg.childNodes[0];
+
+    CZ.appendChild(this.box);
+
+}
+
+Tczech.prototype.activate = function (v) {
+    this.CZ[(v ? 'add' : 'remove') + 'EventListener'](
+        'pointermove', this.comp.bind(this), { once: true }
+    );
+};
+
+Tczech.prototype.comp = function (e) {
+        this.activate(false);
+        this.completed = true;
+        compList.push(this);
+};
+
+Tczech.prototype.reprep = function () {
+
+    this.CZ.addEventListener('dblclick', e => {
+
+        this.completed = false;
+        this.box.classList.remove('completed');
+        this.divS.textDecoration = 'none';
+        this.check.style.opacity = 0;
+
+        waiting = clearTimeout(waiting);
+
+    }, { once: true });
+
+};
+
+//}
+
+// test methods {
+
+const tests = {
+
+    // anything at all
+    non: d => true,
+    
+    // triple underline
+    tri: d => {
+        
+        const L = linz(d).sort((a, b) => a.yMax - b.yMax);
+        let results = {};
+        
+        const width  = L[0].xMax - L[0].xMin;
+      //const height = L[0].yMax - L[0].yMin;
+      
+        const mu = L[0].YYY.reduce((a,b)=>a+b)/L[0].YYY.length;
+      
+        results['three lines'] = L.length === 3;
+       
+        results['valid size'] =
+        width  > prefs.minSize && width  < prefs.maxSize;
+        
+        results['lines flat'] =
+        L.every(_ => _.YYY.every(y => abs(_.YYY[0]-y)<10));
+        
+        results['stacked'] =
+        L.slice(1).every((_, i) => {
+            let m = _.YYY.reduce((a,b)=>a+b)/_.YYY.length;
+            return m > mu && m - mu > 4 * i
+        });
+        
+        results['same size'] =
+        L.slice(1).every((_, i) =>
+            abs(width - (_.xMax - _.xMin)) < 0.5 * width
+        );
+
+        results['lined up'] =
+        L.slice(1).every((_, i) =>
+            abs(_.xMin - L[0].xMin) < 0.5 * width
+        );
+        
+        notes.innerHTML = '&nbsp;trip:: ';
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // u-shaped curve
+    you: d => {
+        
+        let L = linz(d);
+        let results = {};
+        
+        //ratLine.setAttribute('d', L[0].makeSVG().svg);
+
+        //results['one line'] = L.length === 1;
+        
+        L = L[0];
+        L.getTurns(true);
+        
+        results['correct size'] =
+        L.wide > prefs.minSize && L.wide < prefs.maxSize &&
+        L.high > prefs.minSize && L.high < prefs.maxSize;
+        
+        results['x 0 turn'] =
+        L.turns.x === 0;
+        
+        results['y 1 turn'] =
+        L.turns.y === 1;
+            
+        results['ends min'] =
+        (L.YYY[0] === L.yMin || L.YYY.at(-1) === L.yMin);
+        
+        results['1st near last'] =
+        abs(L.YYY[0] - L.YYY.at(-1)) < 10;
+
+        notes.innerHTML = '&nbsp;you:: ';
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // # mark
+    has: d => {
+        
+        const L = linz(d);
+        let results = {};
+        
+        /*
+        ratLine.setAttribute('d',
+            L.map(_ => _.makeSVG().svg).join('')
+        );
+        */
+        
+        // there must be exactly four lines
+        if (L.length !== 4) {
+            notes.innerHTML = 'hash: 4 lines';
+            return false;
+        }
+        
+        const Vz = L.filter(LL =>
+            LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)
+        );
+        
+        const Hz = L.filter(LL =>
+            LL.YYY.every(y => abs(LL.YYY[0] - y) < 20)
+        );
+        
+        results['2 vert'] = Vz.length === 2;
+        results['2 horz'] = Hz.length === 2;
+        
+        if (!results['2 vert'] || !results['2 horz']) {
+            notes.innerHTML = 'hash: 2 hor/2 vert';
+            return;
+        }
+
+        const width  = abs(
+            max(Hz[0].xMax, Hz[1].xMax) -
+            min(Hz[0].xMin, Hz[1].xMin)
+        );
+        const height = abs(
+            max(Vz[0].yMax, Vz[1].yMax) -
+            min(Vz[0].yMin, Vz[1].yMin)
+        );
+        
+        const xMin = min(Vz[0].xMin, Vz[1].xMin);
+        const xMax = max(Vz[0].xMax, Vz[1].xMax);
+        const yMin = max(Vz[0].yMin, Vz[1].yMin);
+        const yMax = min(Vz[0].yMax, Vz[1].yMax);
+        
+        results['width'] = (
+            width  > prefs.minSize && width  < prefs.maxSize
+        );
+        
+        results['heighth'] = (
+            height > prefs.minSize && height < prefs.maxSize
+        );
+
+        results['cross y pos'] = (
+            Hz[0].yMax > yMin && Hz[0].yMax < yMax &&
+            Hz[1].yMax > yMin && Hz[1].yMax < yMax
+        );
+
+        results['cross x pos'] = (
+            Hz[0].xMin < xMin && Hz[0].xMax > xMax &&
+            Hz[1].xMin < xMin && Hz[1].xMax > xMax
+        );
+        
+        notes.innerHTML = '&nbsp;hash:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
+        }
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // a slash, like this: /
+    sla: d => {
+        
+        let L = linz(d);
+        let results = {};
+
+        /*
+        ratLine.setAttribute('d',
+            L.map(_ => _.makeSVG().svg).join('')
+        );
+        */
+        
+        // there must be exactly one line
+        if (L.length !== 1) return false;
+        
+        L = L[0];
+        L.getTurns(true);
+
+        const width  = abs(L.xMax - L.xMin);
+        const height = abs(L.yMax - L.yMin);
+
+        results['size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+            
+        results['0 turns'] =
+        L.turns.x === 0 && L.turns.y === 0;
+        
+        results['x increases'] =
+        L.XXX[0] < L.XXX.at(-1);
+      //L.XXX.slice(1).every((x, i) => x - L.XXX[i] > -2);
+
+        results['y decreases'] =
+        L.YYY[0] > L.YYY.at(-1);
+      //L.YYY.slice(1).every((y, i) => y - L.YYY[i] <  2);
+
+        return(Object.values(results).every(v => v));
+
+    },
+    
+    // backwards-P paragraph
+    par: d => {
+        
+        const L = linz(d);
+        let results = {};
+
+        results['three lines'] = L.length === 3;
+        
+        if (!results['three lines']) {
+            notes.innerHTML = 'par: 3 lines';
+            return;
+        }
+        
+        const Vz = [], Pz = [];
+        
+        L.forEach(LL => {
+            if (LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)) {
+                Vz.push(LL);
+            } else {
+                Pz.push(LL);
+            }
+        });
+        
+        results['2 verts'] = Vz.length === 2;
+        
+        if (!results['2 verts']) {
+            notes.innerHTML = 'par: 2 vert';
+            return false;
+        }
+        
+        const width  = abs(Pz[0].xMax- Pz[0].xMin);
+        const height = max(Vz[0].yMax, Vz[1].yMax)
+                     - min(Vz[0].yMin, Vz[1].yMin);
+        
+        results['correct size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+        
+        results['same start y'] =
+        abs(Vz[0].yMin - Vz[1].yMin) < 20;
+        
+        results['same end y'] =
+        abs(Vz[0].yMax - Vz[1].yMax) < 20;
+        
+        results['no overlap'] =
+        abs(Vz[0].xMin - Vz[1].xMin) > 5;
+        
+        results['p starting y'] =
+        abs(Pz[0].yMin - Vz[0].yMin) < 20;
+        
+        results['p height'] =
+        abs((Pz[0].yMax - Pz[0].yMin) - height/2) <
+        0.2 * height;
+        
+        results['p starts right'] =
+        Pz[0].XXX[0] - max(Vz[0].xMax, Vz[1].xMax) > 5;
+        
+        results['p width'] =
+        Pz[0].xMax - Pz[0].xMin  >
+        2 * abs(Vz[0].xMin - Vz[1].xMin);
+        
+        results['p extends left'] =
+        Pz[0].xMin < min(Vz[0].xMin, Vz[1].xMin);
+        
+        results['p dir'] =
+        Pz[0].XXX[0] > Pz[0].xMin &&
+        Pz[0].XXX.at(-1) > Pz[0].xMin;
+        
+        results['y turns'] =
+        Pz[0].getTurns(true).turns.y < 3;
+        
+        results['x turns'] =
+        Pz[0].turns.x < 2;
+        
+        notes.innerHTML = '&nbsp;par:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += k +', ');
+        }
+        
+        return Object.values(results).every(v => v);
+       
+    },
+    
+    // remove-werd loop
+    lup: d => {
+        
+        let L = linz(d);
+        let results = {};
+        
+        L[0].getTurns();
+        
+        /*
+        ratLine.setAttribute('d',
+            L.map(_ => _.makeSVG().svg).join('')
+        );
+        */
+        
+        // there must be exactly one line
+        if (L.length !== 1) return false;
+        L = L[0];
+
+        /*
+        let tmp = ''; //{
+        if (L.turns.x) {
+            Q = L.turns.xPts;
+            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
+            
+            if (Q.length > 1) {
+                Q.slice(1).forEach(q =>
+                    tmp += 'L' + q[0] + ' ' + q[1]
+                );
+            }
+            
+        }
+        if (L.turns.y) {
+            Q = L.turns.yPts;
+            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
+            
+            if (Q.length > 1) {
+                Q.slice(1).forEach(q =>
+                    tmp += 'L' + q[0] + ' ' + q[1]
+                );
+            }
+            
+        }
+        if (L.turns.x || L.turns.y) {
+            ratPath.setAttribute('d', tmp);
+        } //}
+        */
+        
+        L.getTurns(true);
+        
+        // and precisely two x, one y turns
+        if (L.turns.x !== 2 || L.turns.y !== 1) return false;
+        
+        const width  = abs(L.xMax - L.xMin);
+        const height = abs(L.yMax - L.yMin);
+
+        results['size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+        
+        results['1st is xmin'] =
+        abs(L.XXX[0] - L.xMin) < 0.1 * height;
+        
+        results['last higher'] =
+        L.YYY.at(-1) < L.YYY[0];
+        
+        results['flexions'] =
+        L.turns.xPts[0][0] > L.xMin &&
+        L.turns.xPts[0][1] < L.YYY[0] &&
+        L.turns.yPts[0][0] - L.turns.xPts[0][0] < -5 &&
+        L.turns.yPts[0][0] > L.turns.xPts[1][0];
+        
+        results['end past turn'] =
+      //L.turns.xPts[0][0] < L.XXX.at(-1);
+        L.XXX.at(-1) - L.turns.xPts[0][0] > -5;
+        
+
+        
+        notes.innerHTML = '&nbsp;loop:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
+        }
+        
+        return(Object.values(results).every(v => v));
+        
+    },
+    
+    // missing period
+    per: d => {
+        
+        const L = linz(d);
+        let results = {};
+        
+        // must be precisely two lines
+        if (L.length !== 2) return false;
+        
+        L[0].getTurns(true);
+        
+                
+        const width  = abs(L[0].xMax - L[0].xMin);
+        const height = abs(L[0].yMax - L[0].yMin);
+        const cent = {
+            x: (L[0].xMin + L[0].xMax) / 2,
+            y: (L[0].yMin + L[0].yMax) / 2
+        };
+
+        results['size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+        
+        results['propotion'] =
+        width / height > 0.7 && width / height < 1.8;
+        
+        results['dot small'] =
+        L[1].XXX.length < 5;
+        
+        results['dot close'] =
+        L[1].XXX.slice(1).every((_, i) =>
+            abs(L[1].XXX[i+1] - L[1].XXX[i]) < 5 &&
+            abs(L[1].YYY[i+1] - L[1].YYY[i]) < 5
+        );
+        
+        results['x flex'] =
+        L[0].turns.x > 0 && L[0].turns.x < 3;
+        
+        results['y flex'] =
+        L[0].turns.y > 0 && L[0].turns.y < 4;
+        
+        results['start near end'] =
+        abs(L[0].XXX[0] - L[0].XXX.at(-1)) < 0.3 * width &&
+        abs(L[0].YYY[0] - L[0].YYY.at(-1)) < 0.3 * height;
+        
+        results['center dot'] =
+        abs(cent.x - L[1].XXX[0]) < 0.2 * width &&
+        abs(cent.y - L[1].YYY[0]) < 0.2 * height;
+        
+        notes.innerHTML = '&nbsp;per:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+        
+    },
+    
+    // werds reversed
+    rev: d => {
+        
+        let L = linz(d);
+        let results = {};
+        
+        // must be one line
+        if (L.length !== 1) return false;
+        
+        L = L[0];
+        L.getTurns();
+        
+        //ratLine.setAttribute('d', L.makeSVG().svg);
+
+        /*
+        let tmp = ''; //{
+        if (L.turns.x) {
+            Q = L.turns.xPts;
+            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
+            
+            if (Q.length > 1) {
+                Q.slice(1).forEach(q =>
+                    tmp += 'L' + q[0] + ' ' + q[1]
+                );
+            }
+            
+        }
+        if (L.turns.y) {
+            Q = L.turns.yPts;
+            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
+            
+            if (Q.length > 1) {
+                Q.slice(1).forEach(q =>
+                    tmp += 'L' + q[0] + ' ' + q[1]
+                );
+            }
+            
+        }
+        if (L.turns.x || L.turns.y) {
+            ratPath.setAttribute('d', tmp);
+        }//}
+        */
+        
+        L.getTurns(true);
+        
+        if (L.turns.x !== 0 || L.turns.y !== 2) return false;
+        
+        notes.innerHTML = '';
+        
+        L.turns.xPts.forEach(p => {
+            notes.innerHTML +=
+                ' i: ' + p[2] +
+                ' >> ' + abs(L.XXX[0] - p[0]).toFixed(0) +
+                ', ' + abs(L.YYY[0] - p[1]).toFixed(0)
+        });
+        
+        const width  = abs(L.xMax - L.xMin);
+        const height = abs(L.yMax - L.yMin);
+        
+        let cent = {
+            x: (L.xMin + L.xMax) / 2,
+            y: (L.yMin + L.yMax) / 2,
+        };
+        cent.topQ = (L.yMin + cent.y) / 2;
+        cent.botQ = (L.yMax + cent.y) / 2;
+        
+        results['size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+        
+        results['proportion'] =
+        abs(L.turns.yPts[0][1] - L.turns.yPts[1][1]) > 0.8 * height;
+        
+        results['1st|end pos'] = (() => {
+            let [A, B] =
+            sign(L.YYY[0] - L.turns.yPts[0][1]) === 1 ?
+            [L.YYY[0], L.YYY.at(-1)]:
+            [L.YYY.at(-1), L.YYY[0]];
+            
+            return (
+                A > cent.y - 0.1 * height &&
+                A < L.yMax + 0.2 * height &&
+                B < cent.y + 0.1 * height &&
+                B > L.yMin - 0.2 * height
+            );
+            
+        })();
+        
+        notes.innerHTML = '&nbsp;rev:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+        
+    }
+
+};
+
+//}
+    
+// app methods {
+
+const linz = d => {
+    
+     return d.split(/[^]M/).map(p => new LineObj(p));
+        
+};
+
+const mark = d => {
+
+    const coords = d.match(/[\d\.-]+/g).map(v => Number(v));
+
+    const XXX = coords.filter((_, i) => i % 2 === 0);
+    const YYY = coords.filter((_, i) => i % 2 === 1);
+
+    const min = {
+        x: min(...XXX),
+        y: min(...YYY)
+    };
+
+    const max = {
+        x: max(...XXX),
+        y: max(...YYY)
+    };
+
+    const diff = {
+        x: max.x - min.x,
+        y: max.y - min.y
+    };
+
+    const most = max(diff.x, diff.y);
+
+    const scale = 50 / most;
+
+    const trans = {
+        x: -1 * min.x + most / 2 - diff.x / 2,
+        y: -1 * min.y + most / 2 - diff.y / 2
+    }
+
+    return `scale(${scale}) translate(${trans.x}px, ${trans.y}px) `;
+
+};
+
+const draw = e => {
+
+    e.preventDefault();
+
+    coordList.at(-1).push(new Point(e.pageX, e.pageY));
+
+    let pts = [
+        coordList.at(-1).at(-1),
+        coordList.at(-1).at(-2)
+    ].sort((a, b) => a.y - b.y);
+
+    let dist = sqrt(
+        (pts[0].x - pts[1].x) ** 2 +
+        (pts[0].y - pts[1].y) ** 2
+    );
+    
+    const path = svg.lastChild;
+    
+    if(!path){
+        return;
+    }
+    
+    if(pts[0].y === pts[1].y) {
+        pts.sort((a, b) => b.x - a.x);
+        path.setAttribute('d',
+        (path.getAttribute('d')||'') + (
+            
+            'M' + pts[0].RtoL +
+            'L' + pts[1].LtoR + 'Z'
+            
+        ));
+    } else {
+    
+        path.setAttribute('d',
+            (path.getAttribute('d') || '') + (
+    
+                (
+                    prefs.penTheta <=
+                    atan2(
+                        (pts[0].y - pts[1].y),
+                        (pts[0].x - pts[1].x)
+                    )
+                ) ? (
+    
+                    'M' + pts[0].RtoL +
+                    'L' + pts[1].LtoR + 'Z'
+    
+                ) : (
+    
+                    'M' + pts[0].LtoR +
+                    'L' + pts[1].RtoL + 'Z'
+    
+                )
+    
+        ));
+    }
+
+};
+    
+const down = e => {
+
+    notes.innerHTML = '&nbsp;';
+
+    if (e.pageX > 0.8 * document.body.offsetWidth) {
+        waiting = clearTimeout(waiting);
+        upp();
+        return;
+    }
+
+    for (let i in this) {
+        this[i].completed || this[i].activate(true);
+    }
+
+    pointCount = 0;
+    coordList.push([]);
+    coordList.at(-1).push(new Point(e.pageX, e.pageY));
+
+
+    waiting = clearTimeout(waiting);
+    let path = document.createElementNS(NS, 'path');
+    path.setAttribute('fill-rule', 'nonzero');
+
+    svg.appendChild(path);
+
+    e.target.releasePointerCapture(e.pointerId);
+
+    addLiz('pointermove', draw, { passive: false });
+
+};
+
+const upp  = () => {
+    
+    let path = svg.lastChild;
+    
+    if (!path) return;
+    
+    remLiz('pointermove', draw, {passive:false});
+
+    for (let i in this) {
+        if (!this[i].completed) {
+            this[i].activate(false);
+        }
+    }
+
+    waiting = setTimeout(exam, 1000);//600);
+
+};
+
+const exam = () => {
+
+    waiting = false;
+    
+    const path = svg.lastChild;
+    
+    if (!path) {
+        complist = [];
+        return;
+    }
+    
+    const d = path.getAttribute('d');
+    
+    if (d.split('L').length < 2) complist = [];
+    
+    for (let CZ of compList) {
+        
+        if (CZ.test(d, CZ)) {
+        
+            CZ.divS.setProperty('text-decoration', 'line-through');
+            CZ.box.classList.add('completed');
+            CZ.check.style.opacity = 1;
+        
+            if (prefs.useDrawnMark) {
+        
+                CZ.check.style.d = 'path("' + d + '")';
+                CZ.check.style.transform = mark(d);
+        
+            }
+        
+        } else {
+            CZ.activate(true);
+        }
+        
+        CZ.reprep();
+    }
+    
+    compList = [];
+    coordList = [];
+
+    path.style.opacity = 0;
+    //setTimeout(() => svg.removeChild(path), 500);
+    setTimeout(() => svg.innerHTML = '', 500);
+
+};
+
+//}
+
+// create objects {
+
+document.querySelectorAll('[data-czech]').forEach((CZ, i) =>
+    this[i] = new Tczech(CZ)
+);
+
+//}
+
+// add lizzers {
+
+addLiz('pointerdown', down);
+addLiz('pointerup', upp);
+addLiz('pointercancel', upp);
+//addLiz('pointercancel', e => complist = []);
+
+//}
+
+}();
+
+</script>
+
+</html>
+  
