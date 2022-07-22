@@ -16,12 +16,6 @@ content="width=device-width, initial-scale=1.0">
     word-wrap: break-word;
 }
 
-html {
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-}
-
 body {
     
     --nose-hsla: hsla(20, 40%, 100%, 0);
@@ -275,7 +269,7 @@ svg {
 path {
     xfill: none;
     fill: var(--lightness, #f0f);
-    stroke: none;
+    xstroke: none;
     xstroke-width: var(--linesize);
     xstroke-linecap: round;
     xstroke: var(--lightness, #f0f);
@@ -313,10 +307,10 @@ path {
 
 #ratLine {
     fill: none;
-    --dotdot-color: #ea0;
-    stroke: rgba(255,255,2550.5):
-    --linesize: 0.25px;
-    stroke-width: 0.2px;
+    --xdotdot-color: #ea0;
+    stroke: rgba(255,0,2,0.5):
+    --xlinesize: 5px;
+    stroke-width: 5px;
     marker-start: url(#dotQ);
     marker-mid: url(#dotQ);
     marker-end: url(#dotQ);
@@ -412,22 +406,23 @@ path {
 .titleArrow {
     display: inline-block;
     transform: rotate(0deg);
-    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-    background-color: var(--darkness);
-    height: 17.32px;
-    width: 20px;
-    vertical-align: middle;
-    transform-origin: 50% 25%;
+    xclip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    xbackground-color: var(--lightness);
+    height: 100%;
+    text-align: center;
+    font-size: 0.9em;
+    xvertical-align: middle;
+    xtransform-origin: 50% 50%;
     transition: transform linear 300ms;
     
 }
 
 #title:hover .titleArrow.left {
-    transform: rotate(180deg) translateY(-5px);
+    transform: rotate( 180deg) translateY(5px);
 }
 
 #title:hover .titleArrow.rite {
-    transform: rotate(-180deg) translateY(-5px);
+    transform: rotate(-180deg) translateY(5px);
 }
 
 /*possibly a mobile landscraper*/
@@ -444,22 +439,29 @@ path {
 <div id="hold0" class="holder">
     
     <div id="title" class="qr">
-    <div class="titleArrow left"></div>
+    <div class="titleArrow left"> &#9660; </div>
     tczekov
-    <div class="titleArrow rite"></div>
+    <div class="titleArrow rite"> &#9660; </div>
     </div>
     
     <div id="notes" class="qr" style="
         font-size:20px;
         text-align:center;
         padding: 0;
-    ">
-        skry drawing each editing symbol;
-        double-click to reactivate
+    "> ...
     </div>
     
     <div>
-    <div id="addArea" class="qr"
+        
+    <div id="30" class="qr" data-czech="chx">
+    &nbsp;check mark:&nbsp;&nbsp;
+    <b><i>&#10003;</i></b>&nbsp;</div>
+    
+    <div id="30x" class="qr" data-czech="xix">
+    &nbsp;marx the spot:&nbsp;&nbsp;
+    <b><i>&#215;</i></b>&nbsp;</div>
+    
+    <!--div id="addArea" class="qr"
     style="
         display:flex;
     "
@@ -468,7 +470,8 @@ path {
          placeholder="... add item"
          type="text">
         <input id="addBox" type="button" value="+">
-    </div>
+    </div-->
+    
     </div>
     
     <br>
@@ -513,7 +516,8 @@ path {
     </defs>
     <g>
         <ellipse id="ratLips"/>
-        <path id="ratLine" />
+        <path id="ratLine" stroke="#c30"
+        stroke-width="5"/>
         <path id="ratPath" />
     </g>
     <g id="pad"></g>
@@ -539,9 +543,8 @@ const prefs = {
     useDrawnMark : false,
     minSize : 10,
     maxSize : 150,
-    penWidth : 10,
-    //penTheta : -0.46, //radians
-    penTheta : -0.2,
+    penWidth : 8,
+    penTheta : -0.46, //radians
     rat: 'master'
 };
     
@@ -578,31 +581,38 @@ const ytra = sin(prefs.penTheta) * prefs.penWidth;
 
 // point object {
 
-let pointCount = 0;
-
 function Point (x, y) {
     
     this.x = x;
     this.y = y;
-    
-    let wid = ( 11 +
-       5 * sin((pointCount += 0.2))
-    );
-    wid = prefs.penWidth;
-    
-    let xxx = cos(prefs.penTheta) * wid;
-    let yyy = sin(prefs.penTheta) * wid;
-    
-    this.rite = { 'x': x + xxx, 'y': y + yyy };
-    this.left = { 'x': x - xxx, 'y': y - yyy };
-    
-    this.RtoL = this.rite.x +' '+ this.rite.y + 'L' +
-                this.left.x +' '+ this.left.y;
-    this.LtoR = this.left.x +' '+ this.left.y + 'L' +
-                this.rite.x +' '+ this.rite.y;
                 
 }
-Point
+
+Point.prototype.RtoL = function (wide = prefs.penWidth) {
+    
+    let xxx = cos(prefs.penTheta) * wide;
+    let yyy = sin(prefs.penTheta) * wide;
+    
+    let rite = { 'x': this.x + xxx, 'y': this.y + yyy };
+    let left = { 'x': this.x - xxx, 'y': this.y - yyy };
+    
+    return rite.x +' '+ rite.y + 'L' +
+           left.x +' '+ left.y;
+    
+};
+
+Point.prototype.LtoR = function (wide = prefs.penWidth) {
+    
+    let xxx = cos(prefs.penTheta) * wide;
+    let yyy = sin(prefs.penTheta) * wide;
+    
+    let rite = { 'x': this.x + xxx, 'y': this.y + yyy };
+    let left = { 'x': this.x - xxx, 'y': this.y - yyy };
+    
+    return left.x +' '+ left.y + 'L' +
+           rite.x +' '+ rite.y;
+    
+};
     
 //}
 
@@ -713,8 +723,9 @@ LineObj.prototype.getSlopes = function () {
     this.slopes = {
     
         val: this.XXX.slice(1).map((_, i) =>
-             (this.YYY[i] - this.YYY[i + 1]) /
-             (this.XXX[i] - this.XXX[i + 1])
+            (this.YYY[i] - this.YYY[i + 1]) /
+            (this.XXX[i] - this.XXX[i + 1])
+            
         ),
     
         all: (this.YYY.at(-1) - this.YYY[0]) /
@@ -730,6 +741,38 @@ LineObj.prototype.getSlopes = function () {
     
     return this;
     
+};
+
+LineObj.prototype.getAtOrig = function (a = 0, b = null) {
+
+    let pts = this.coor.slice(a, b||this.coor.length);
+    
+    let ang = atan2(
+        pts.at(-1)[1] - pts[0][1],
+        pts.at(-1)[0] - pts[0][0]
+    );
+    
+    let T = 1.57 - ang;
+    
+    let cosT = cos(T);
+    let sinT = sin(T);
+
+    pts = pts.map(d => [
+        d[0] - pts[0][0],
+        d[1] - pts[0][1]
+    ]);
+
+    pts = pts.map(d => [
+        d[0] * cosT - d[1] * sinT,
+        d[0] * sinT + d[1] * cosT
+    ]);
+
+    return {
+        'pts': pts,
+        'ang': ang,
+        'len': pts.at(-1)[1]
+    };
+
 };
 
 LineObj.prototype.makeSVG = function () {
@@ -807,6 +850,284 @@ const tests = {
 
     // anything at all
     non: d => true,
+    
+    // + sign
+    pls: d => {
+        
+        const L = linz(d);
+        let results = {};
+
+        // there must be exactly two lines
+        if (L.length !== 2) {
+            notes.innerHTML = 'plus: 2 lines';
+            return false;
+        }
+        
+        let Vz = L.filter(LL =>
+            LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
+        );
+        
+        let Hz = L.filter(LL =>
+            LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
+        );
+        
+        results['1 vert'] = Vz.length === 1;
+        results['1 horz'] = Hz.length === 1;
+        
+        if (!results['1 vert'] || !results['1 horz']) {
+            notes.innerHTML = 'plus: 1 hor/1 vert';
+            return;
+        }
+
+        Vz = Vz[0];
+        Hz = Hz[0];
+        
+        const width  = Hz.wide;
+        const height = Vz.high;
+        
+        results['width'] = (
+            width  > prefs.minSize && width  < prefs.maxSize
+        );
+        
+        results['heighth'] = (
+            height > prefs.minSize && height < prefs.maxSize
+        );
+
+        results['turns'] = (
+            Hz.getTurns(true).turns.y < 2 &&
+            Vz.getTurns(true).turns.x < 2
+        );
+
+        results['hor cross'] = (
+            abs(Hz.yMax - (Vz.yMax + Vz.yMin)/2)
+            < 0.15 * height
+        );
+
+        results['vert cross'] = (
+            Vz.xMax > Hz.xMin && Vz.xMax < Hz.xMax
+        );
+        
+        notes.innerHTML = '&nbsp;plus:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
+        }
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // x mark
+    xix: d => {
+        
+        const L = linz(d);
+        let results = {};
+        
+        // there must be exactly two lines
+        if (L.length !== 2) {
+            notes.innerHTML = 'xix: 2 lines';
+            return false;
+        }
+        
+        L.forEach(LL => LL.getSlopes());
+        
+        let Up = L.filter(LL =>
+            LL.slopes.val.every(s => s < -0.2)//0)
+        );
+        
+        let Dn = L.filter(LL =>
+            LL.slopes.val.every(s => s >  0.2)
+        );
+        
+        results['1 up'] = Up.length === 1;
+        results['1 dn'] = Dn.length === 1;
+        
+        if (!results['1 up'] || !results['1 dn']) {
+            notes.innerHTML = 'xix: 1 up/1 dn';
+            return;
+        }
+
+        Up = Up[0];
+        Dn = Dn[0];
+        
+        // compute rotation angle
+        let T = 1.57 - atan2(
+            Dn.yMax - Dn.yMin,
+            Dn.xMax - Dn.xMin
+        );
+        
+        // get points
+        let upPts = [
+            { x: Up.xMin, y: Up.yMax },
+            { x: Up.xMax, y: Up.yMin }
+            ,
+            { x: Dn.xMax, y: Dn.yMax }
+        ];
+        
+        // adjust to origin
+        upPts = upPts.map(p =>
+            ({'x': p.x - Dn.xMin, 'y': p.y - Dn.yMin})
+        );
+        
+        // rotate
+        upPts = upPts.map(p => {
+            return ({
+                'x': p.x * cos(T) - p.y * sin(T),
+                'y': p.x * sin(T) + p.y * cos(T)
+            });
+        });
+        
+        let b = upPts[1].y - upPts[1].x * (
+            (upPts[1].y - upPts[0].y)/
+            (upPts[1].x - upPts[0].x)
+        );
+        
+        const width  = Up.wide;
+        const height = Dn.high;
+        
+        results['width'] = (
+            width  > prefs.minSize && width  < prefs.maxSize
+        );
+        
+        results['heighth'] = (
+            height > prefs.minSize && height < prefs.maxSize
+        );
+        
+        results['crosses'] = (
+            sign(upPts[0].x) !== sign(upPts[1].x) &&
+            b > 0 && b < upPts[2].y
+        );
+
+        notes.innerHTML = '&nbsp;xix:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+    
+    // check-mark
+    chx: d => {
+        
+        let L = linz(d);
+        let results = {};
+
+        // there must be exactly one line
+        if (L.length !== 1) {
+            notes.innerHTML = 'check:: 1 line';
+            return false;
+        }
+        
+        L = L[0];
+        L.getTurns(true);
+        
+        results['turns'] =
+        L.turns.x === 0 && L.turns.y === 1;
+        
+        if(!results['turns']) {
+            notes.innerHTML='check:: turns'
+            return;
+        }
+        
+        let Dn = L.getAtOrig(0, L.turns.yPts[0][2] + 1);
+        
+        let Up = L.getAtOrig(   L.turns.yPts[0][2]);
+        
+            /*
+        ratLine.setAttribute('d',
+            'M' +
+            Dn.pts[0][0] +' '+ Dn.pts[0][1] +
+            Dn.pts.slice(1)
+            .map(_ => 'L'+ _[0] +' '+ _[1] +' ').join('')
+            'M' +
+            Up.pts[0][0] +' '+ Up.pts[0][1] +
+            Up.pts.slice(1)
+            .map(_ => 'L'+ _[0] +' '+ _[1] +' ').join('')
+        );
+            */
+        
+        const wide = L.wide;
+        const high = L.high;
+
+        results['size'] =
+        wide > prefs.minSize && wide < prefs.maxSize &&
+        high > prefs.minSize && high < prefs.maxSize;
+        
+        results['direction'] =
+        L.XXX[0] < L.XXX.at(-1);
+
+        results['up longer'] =
+        L.YYY[0] - L.YYY.at(-1) > 0.2 * high ||
+        Up.len > 2 * Dn.len;
+        
+        results['turn lower'] =
+        L.turns.yPts[0][1] - L.YYY[0] > 0.1 * high;
+        
+        /*
+        results['turn close to start'] =
+        L.turns.yPts[0][0] - L.XXX[0] < 0.6 * wide;
+        */
+        
+        results['angle'] =
+        Dn.ang - Up.ang > 1.2;
+        //(180 * Dn.ang / Math.PI) -
+        //(180 * Up.ang / Math.PI) > 70;
+        
+        results['dn strait'] =
+        Dn.pts.every(p => -3 < p[0] && p[0] < 5);
+        
+        results['up strait'] =
+        Up.pts.every(p => -3 < p[0] && p[0] < 10);
+        
+        notes.innerHTML = '&nbsp;check:: ';
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // a slash, like this: /
+    sla: d => {
+        
+        let L = linz(d);
+        let results = {};
+
+        /*
+        ratLine.setAttribute('d',
+            L.map(_ => _.makeSVG().svg).join('')
+        );
+        */
+        
+        // there must be exactly one line
+        if (L.length !== 1) return false;
+        
+        L = L[0];
+        L.getTurns(true);
+
+        const width  = abs(L.xMax - L.xMin);
+        const height = abs(L.yMax - L.yMin);
+
+        results['size'] =
+        width  > prefs.minSize && width  < prefs.maxSize &&
+        height > prefs.minSize && height < prefs.maxSize;
+            
+        results['0 turns'] =
+        L.turns.x === 0 && L.turns.y === 0;
+        
+        results['x increases'] =
+        L.XXX[0] < L.XXX.at(-1);
+      //L.XXX.slice(1).every((x, i) => x - L.XXX[i] > -2);
+
+        results['y decreases'] =
+        L.YYY[0] > L.YYY.at(-1);
+      //L.YYY.slice(1).every((y, i) => y - L.YYY[i] <  2);
+
+        return(Object.values(results).every(v => v));
+
+    },
     
     // triple underline
     tri: d => {
@@ -897,7 +1218,7 @@ const tests = {
         let results = {};
         
         /*
-        ratLine.setAttribute('d',
+            ratLine.setAttribute('d',
             L.map(_ => _.makeSVG().svg).join('')
         );
         */
@@ -965,46 +1286,6 @@ const tests = {
 
     },
 
-    // a slash, like this: /
-    sla: d => {
-        
-        let L = linz(d);
-        let results = {};
-
-        /*
-        ratLine.setAttribute('d',
-            L.map(_ => _.makeSVG().svg).join('')
-        );
-        */
-        
-        // there must be exactly one line
-        if (L.length !== 1) return false;
-        
-        L = L[0];
-        L.getTurns(true);
-
-        const width  = abs(L.xMax - L.xMin);
-        const height = abs(L.yMax - L.yMin);
-
-        results['size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-            
-        results['0 turns'] =
-        L.turns.x === 0 && L.turns.y === 0;
-        
-        results['x increases'] =
-        L.XXX[0] < L.XXX.at(-1);
-      //L.XXX.slice(1).every((x, i) => x - L.XXX[i] > -2);
-
-        results['y decreases'] =
-        L.YYY[0] > L.YYY.at(-1);
-      //L.YYY.slice(1).every((y, i) => y - L.YYY[i] <  2);
-
-        return(Object.values(results).every(v => v));
-
-    },
-    
     // backwards-P paragraph
     par: d => {
         
@@ -1341,7 +1622,8 @@ const tests = {
 
 const linz = d => {
     
-     return d.split(/[^]M/).map(p => new LineObj(p));
+   //return d.split(/[^]M/).map(p => new LineObj(p));
+     return d.split(']').map(p => new LineObj(p));
         
 };
 
@@ -1384,7 +1666,13 @@ const draw = e => {
 
     e.preventDefault();
 
+    if (
+        e.pageX === coordList.at(-1).x &&
+        e.pageY === coordList.at(-1).y
+    ) return;
+    
     coordList.at(-1).push(new Point(e.pageX, e.pageY));
+    
 
     let pts = [
         coordList.at(-1).at(-1),
@@ -1395,6 +1683,8 @@ const draw = e => {
         (pts[0].x - pts[1].x) ** 2 +
         (pts[0].y - pts[1].y) ** 2
     );
+    
+    let W = prefs.penWidth;
     
     const path = svg.lastChild;
     
@@ -1407,8 +1697,8 @@ const draw = e => {
         path.setAttribute('d',
         (path.getAttribute('d')||'') + (
             
-            'M' + pts[0].RtoL +
-            'L' + pts[1].LtoR + 'Z'
+            'M' + pts[0].RtoL(W) +
+            'L' + pts[1].LtoR(W) + 'Z'
             
         ));
     } else {
@@ -1424,13 +1714,13 @@ const draw = e => {
                     )
                 ) ? (
     
-                    'M' + pts[0].RtoL +
-                    'L' + pts[1].LtoR + 'Z'
+                    'M' + pts[0].RtoL(W) +
+                    'L' + pts[1].LtoR(W) + 'Z'
     
                 ) : (
     
-                    'M' + pts[0].LtoR +
-                    'L' + pts[1].RtoL + 'Z'
+                    'M' + pts[0].LtoR(W) +
+                    'L' + pts[1].RtoL(W) + 'Z'
     
                 )
     
@@ -1453,16 +1743,22 @@ const down = e => {
         this[i].completed || this[i].activate(true);
     }
 
-    pointCount = 0;
-    coordList.push([]);
+    if (waiting) {
+        
+        waiting = clearTimeout(waiting);
+        coordList.push([]);
+        
+    } else {
+    
+        let path = document.createElementNS(NS, 'path');
+        path.setAttribute('fill-rule', 'nonzero');
+    
+        coordList = [[]];
+        svg.appendChild(path);
+        
+    }
+
     coordList.at(-1).push(new Point(e.pageX, e.pageY));
-
-
-    waiting = clearTimeout(waiting);
-    let path = document.createElementNS(NS, 'path');
-    path.setAttribute('fill-rule', 'nonzero');
-
-    svg.appendChild(path);
 
     e.target.releasePointerCapture(e.pointerId);
 
@@ -1499,9 +1795,11 @@ const exam = () => {
         return;
     }
     
-    const d = path.getAttribute('d');
+    //const d = path.getAttribute('d');
+    const d = JSON.stringify(coordList)
+    .replace(/\]\]/g,'');
     
-    if (d.split('L').length < 2) complist = [];
+    //if (d.split('L').length < 2) complist = [];
     
     for (let CZ of compList) {
         
@@ -1529,8 +1827,7 @@ const exam = () => {
     coordList = [];
 
     path.style.opacity = 0;
-    //setTimeout(() => svg.removeChild(path), 500);
-    setTimeout(() => svg.innerHTML = '', 500);
+    setTimeout(() => svg.removeChild(path), 500);
 
 };
 
@@ -1546,10 +1843,9 @@ document.querySelectorAll('[data-czech]').forEach((CZ, i) =>
 
 // add lizzers {
 
-addLiz('pointerdown', down);
-addLiz('pointerup', upp);
-addLiz('pointercancel', upp);
-//addLiz('pointercancel', e => complist = []);
+addLiz('pointerdown', down, { passive: false });
+addLiz('pointerup', upp, { passive: false });
+addLiz('pointercancel', upp, { passive: false });
 
 //}
 
