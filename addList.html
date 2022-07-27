@@ -286,23 +286,16 @@ path {
 
 #ratPath {
     stroke: var(--lightness);
-    stroke-width: 0px;
+    stroke-width: 1px;
     marker-start: url(#dot);
     marker-mid: url(#dot);
     marker-end: url(#dot);
 }
 
-#ratLips {
-    display: none;
-    fill: none;
+.ratLips {
+    fill: var(--darkness);
     stroke: var(--midness);
     stroke-width: 10px;
-    cx: 100;
-    cy: 100;
-    rx: 2;
-    ry: 2;
-    transform-box: fill-box;
-    transform-origin: center;
 }
 
 #ratLine {
@@ -453,30 +446,21 @@ path {
     
     <div>
         
-    <div id="30" class="qr" data-czech="chx">
-    &nbsp;check mark:&nbsp;&nbsp;
-    <b><i>&#10003;</i></b>&nbsp;</div>
-    
-    <div id="30x" class="qr" data-czech="xix">
-    &nbsp;marx the spot:&nbsp;&nbsp;
+    <div id="30x" class="qr" data-czech="crs">
+    &nbsp;
+    any two crossed
+    &nbsp;&nbsp;
+    <b><i>
+        &#8734;
+    </i></b>&nbsp;</div>
+     
+    <div id="xiix" class="qr" data-czech="xix">
+    &nbsp;marx the spot&nbsp;&nbsp;
     <b><i>&#215;</i></b>&nbsp;</div>
-    
-    <!--div id="addArea" class="qr"
-    style="
-        display:flex;
-    "
-    >
-        <input id="addInput"
-         placeholder="... add item"
-         type="text">
-        <input id="addBox" type="button" value="+">
-    </div-->
     
     </div>
     
-    <br>
-    <hr>
-    <div class="qr signature">~queviva</div>
+    <br><hr><div class="qr signature">~queviva</div>
     
 </div>
 <div svgdiv ><svg viewbox="0 0 50 50">
@@ -514,8 +498,8 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g>
-        <ellipse id="ratLips"/>
+    <g id="ratGroup" transform="translate(0 0)">
+        <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
         <path id="ratPath" />
@@ -585,62 +569,46 @@ function Point (x, y) {
     
     this.x = x;
     this.y = y;
-                
+    
+    this.RtoL = (x + xtra) +' '+ (y + ytra) + 'L' +
+                (x - xtra) +' '+ (y - ytra);
+    
+    this.LtoR = (x - xtra) +' '+ (y - ytra) + 'L' +
+                (x + xtra) +' '+ (y + ytra);
+    
 }
 
-Point.prototype.RtoL = function (wide = prefs.penWidth) {
-    
-    let xxx = cos(prefs.penTheta) * wide;
-    let yyy = sin(prefs.penTheta) * wide;
-    
-    let rite = { 'x': this.x + xxx, 'y': this.y + yyy };
-    let left = { 'x': this.x - xxx, 'y': this.y - yyy };
-    
-    return rite.x +' '+ rite.y + 'L' +
-           left.x +' '+ left.y;
-    
-};
-
-Point.prototype.LtoR = function (wide = prefs.penWidth) {
-    
-    let xxx = cos(prefs.penTheta) * wide;
-    let yyy = sin(prefs.penTheta) * wide;
-    
-    let rite = { 'x': this.x + xxx, 'y': this.y + yyy };
-    let left = { 'x': this.x - xxx, 'y': this.y - yyy };
-    
-    return left.x +' '+ left.y + 'L' +
-           rite.x +' '+ rite.y;
-    
-};
-    
 //}
 
 // line object {
     
-function LineObj (d) {
+function LineObj (d, filt=true) {
 
-    // turn all the numbers into numbers
-    let N = d.match(/[\d\.-]+/g).map(v => Number(v));
+    this.coor = d;
+    
+    let XXX = d.map(_ => _[0]);
+    let YYY = d.map(_ => _[1]);
 
-    let XXX = N.filter((_, i) => i % 2 === 0);
-    let YYY = N.filter((_, i) => i % 2 === 1);
-
-    this.coor = [[XXX[0], YYY[0]]];
-
-    XXX.slice(2, -1).forEach((_, i) => {
-
-        if (
-               XXX[i + 2] !== XXX[i + 1]
-            && YYY[i + 2] !== YYY[i + 1]
-
-        ) {
-            this.coor.push([XXX[i + 1], YYY[i + 1]]);
-        }
-
-    });
-
-    this.coor.push([XXX.at(-1), YYY.at(-1)]);
+    if (filt) {
+        
+        this.coor = [
+            [XXX[0], YYY[0]]
+        ];
+    
+        XXX.slice(2, -1).forEach((_, i) => {
+    
+            if (
+                XXX[i + 2] !== XXX[i + 1] &&
+                YYY[i + 2] !== YYY[i + 1]
+    
+            ) {
+                this.coor.push([XXX[i + 1], YYY[i + 1]]);
+            }
+    
+        });
+    
+        this.coor.push([XXX.at(-1), YYY.at(-1)]);
+    }
 
     this.XXX = this.coor.map(c => c[0]);
     this.YYY = this.coor.map(c => c[1]);
@@ -653,7 +621,7 @@ function LineObj (d) {
 
 }
 
-LineObj.prototype.getTurns = function (filt = false) {
+LineObj.prototype.getTurns = function (filt=false) {
 
     this.turns = {};
     
@@ -686,7 +654,7 @@ LineObj.prototype.getTurns = function (filt = false) {
                 return t[2] > 5 || (
                     abs(this.XXX[0] - t[0]) > 5 ||
                     abs(this.YYY[0] - t[1]) > 10
-                    )
+                )
             });
             
         }
@@ -743,7 +711,47 @@ LineObj.prototype.getSlopes = function () {
     
 };
 
-LineObj.prototype.getAtOrig = function (a = 0, b = null) {
+LineObj.prototype.getSelfXs = function () {
+
+    this.crosses = [];
+    
+    this.coor.slice(1, -2).forEach((ci, i) => {
+    this.coor.slice(i + 3).forEach((cj, j) => {
+    
+        let p = crss([this.coor[i],ci,this.coor[i+j+2],cj]);
+        
+        if (p) this.crosses.push(new Point(...p));
+    
+    })});
+    
+    /*
+    lipGroup.innerHTML = '';
+    this.crosspt.forEach(pt => {
+        let lip = document.createElementNS(NS,'ellipse');
+        lip.setAttribute('fill', 'var(--darkness)');
+        lip.setAttribute('rx', 10);
+        lip.setAttribute('ry', 10);
+        lip.setAttribute('cx', pt.x);
+        lip.setAttribute('cy', pt.y);
+        lipGroup.append(lip);
+    });
+    ratPath.setAttribute('d', '');
+    ratLine.setAttribute('d',
+        this.crosses.map(c =>
+            'M' + c[0].x + ' ' + c[0].y +
+            'L' + c[1].x + ' ' + c[1].y +
+            'M' + c[2].x + ' ' + c[2].y +
+            'L' + c[3].x + ' ' + c[3].y
+   
+        ).join('')
+    );
+    //*/
+    
+    return this;
+    
+};
+
+LineObj.prototype.getAtOrig = function (a=0, b=null) {
 
     let pts = this.coor.slice(a, b||this.coor.length);
     
@@ -767,11 +775,11 @@ LineObj.prototype.getAtOrig = function (a = 0, b = null) {
         d[0] * sinT + d[1] * cosT
     ]);
 
-    return {
-        'pts': pts,
-        'ang': ang,
-        'len': pts.at(-1)[1]
-    };
+    this.org = new LineObj(pts, false);
+    this.org.ang = ang;
+    this.org.len = pts.at(-1)[1];
+    
+    return this;
 
 };
 
@@ -799,7 +807,7 @@ function Tczech (CZ) {
     this.CZ = CZ;
     this.divS = CZ.style;
 
-    this.test = tests[CZ.dataset['czech'] || 'non'];
+    this.test = tests[CZ.dataset['czech'] || 'any'];
 
     this.completed = false;
 
@@ -847,167 +855,275 @@ Tczech.prototype.reprep = function () {
 // test methods {
 
 const tests = {
+    
+    // re-dones {
 
-    // anything at all
-    non: d => true,
+    // {} nothing at all
+    nun: d => false,
+    
+    // *  anything at all
+    any: d => true,
+    
+    // | up stroke
+    ups: d => {
+        
+        if (d.length !== 1) return false;
+                
+        const L = linz(d, 0)[0].getTurns(true).getAtOrig();
+        
+        return (
+            
+            L.wide < 10 &&
+            L.high > 20 && L.high < 2 * prefs.maxSize &&
+            L.turns.x === 0 && L.turns.y === 0 &&
+            L.org.ang < -1.3 && L.org.ang > -1.84
+            
+        );
+        
+    },
+         
+    // | dn stroke
+    dns: d => {
+        
+        if (d.length !== 1) return false;
+                
+        const L = linz(d, 0)[0].getTurns(true).getAtOrig();
+        
+        return (
+            
+            L.wide < 10 &&
+            L.high > 20 && L.high < 2 * prefs.maxSize &&
+            L.turns.x === 0 && L.turns.y === 0 &&
+            L.org.ang > 1.3 && L.org.ang < 1.84
+            
+        );
+        
+    },
+        
+    // _ underline
+    und: d => {
+                
+        if (d.length !== 1) return false;
+        
+        const L = linz(d)[0].getTurns(true).getAtOrig();
+        
+        return (
+            
+            L.wide > 20 && L.wide < 2 * prefs.maxSize &&
+            L.high < 0.1 * L.wide &&
+            L.turns.x === 0 && L.turns.y < 2
+            
+        );
+        
+    },
+    
+    // / slash
+    sla: d => {
+        
+        if (d.length !== 1) return false;
+        
+        const L = linz(d)[0].getTurns(true);
+
+        return (
+            
+            L.wide > prefs.minSize &&
+            L.wide < prefs.maxSize &&
+            L.high > prefs.minSize &&
+            L.high < prefs.maxSize &&
+            
+            L.turns.x === 0 &&
+            L.turns.y === 0 &&
+        
+            (L.XXX[0] < L.XXX.at(-1) &&
+             L.YYY[0] > L.YYY.at(-1))||
+            (L.XXX[0] > L.XXX.at(-1) &&
+             L.YYY[0] < L.YYY.at(-1))
+             
+        );
+
+    },
     
     // + sign
     pls: d => {
         
+        if (d.length !== 2) return false;
+        
         const L = linz(d);
-        let results = {};
-
-        // there must be exactly two lines
-        if (L.length !== 2) {
-            notes.innerHTML = 'plus: 2 lines';
-            return false;
-        }
         
-        let Vz = L.filter(LL =>
+        const Vt = L.filter(LL =>
             LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
-        );
+        )[0];
         
-        let Hz = L.filter(LL =>
+        const Hz = L.filter(LL =>
             LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
-        );
+        )[0];
         
-        results['1 vert'] = Vz.length === 1;
-        results['1 horz'] = Hz.length === 1;
-        
-        if (!results['1 vert'] || !results['1 horz']) {
-            notes.innerHTML = 'plus: 1 hor/1 vert';
-            return;
-        }
+        if(!Vt || !Hz) return false;
 
-        Vz = Vz[0];
-        Hz = Hz[0];
-        
-        const width  = Hz.wide;
-        const height = Vz.high;
-        
-        results['width'] = (
-            width  > prefs.minSize && width  < prefs.maxSize
-        );
-        
-        results['heighth'] = (
-            height > prefs.minSize && height < prefs.maxSize
-        );
+        return (
 
-        results['turns'] = (
-            Hz.getTurns(true).turns.y < 2 &&
-            Vz.getTurns(true).turns.x < 2
-        );
-
-        results['hor cross'] = (
-            abs(Hz.yMax - (Vz.yMax + Vz.yMin)/2)
-            < 0.15 * height
-        );
-
-        results['vert cross'] = (
-            Vz.xMax > Hz.xMin && Vz.xMax < Hz.xMax
+            Hz.wide > prefs.minSize &&
+            Hz.wide < prefs.maxSize &&
+            Vt.high > prefs.minSize &&
+            Vt.high < prefs.maxSize &&
+            
+            abs(Hz.yMax - Vt.yMin - Vt.high/2)
+            < 0.15 * Vt.high &&
+            
+            Vt.xMax > Hz.xMin && Vt.xMax < Hz.xMax
+            
         );
         
-        notes.innerHTML = '&nbsp;plus:: ';
+    },
+    
+    // two lines cross
+    crs: d => {
         
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
-        }
-        return(Object.values(results).every(v => v));
+        if (d.length !== 2) return false;
+        
+        const L = linz(d);
+        
+        return (
+            L[0].coor.slice(1).some((ci, i) =>
+            L[1].coor.slice(1).some((cj, j) =>
+                crss([L[0].coor[i], ci, L[1].coor[j], cj])
+            ))
+        );
 
     },
+   
+    // self crossing
+    scr: d => {
+    
+        if (d.length !== 1) return false;
+        
+        const L = linz(d)[0];
+        
+        return (
+            L.coor.slice(1, -2).some((ci, i) =>
+            L.coor.slice(i + 3).some((cj, j) =>
+                crss([L.coor[i], ci, L.coor[i+j+2], cj])
+            ))
+        );
+    
+    },
 
+    //}
+    
+    
     // x mark
-    xix: d => {
+    OLDxix: d => {
+        
+        if (d.length !== 2) return false;
         
         const L = linz(d);
-        let results = {};
-        
-        // there must be exactly two lines
-        if (L.length !== 2) {
-            notes.innerHTML = 'xix: 2 lines';
-            return false;
-        }
-        
-        L.forEach(LL => LL.getSlopes());
         
         let Up = L.filter(LL =>
-            LL.slopes.val.every(s => s < -0.2)//0)
-        );
+            LL.getSlopes().slopes.val.every(s => s < -0.2)
+        )[0];
         
         let Dn = L.filter(LL =>
-            LL.slopes.val.every(s => s >  0.2)
+            LL.getSlopes().slopes.val.every(s => s >  0.2)
+        )[0];
+        
+        if (!Up || !Dn) return false;
+        
+        return (
+            
+            Up.wide > prefs.minSize &&
+            Up.wide < prefs.maxSize &&
+            Dn.high > prefs.minSize &&
+            Dn.high < prefs.maxSize &&
+            
+            crss([
+                Dn.coor[0], Dn.coor.at(-1),
+                Up.coor[0], Up.coor.at(-1)
+            ])
+        
         );
-        
-        results['1 up'] = Up.length === 1;
-        results['1 dn'] = Dn.length === 1;
-        
-        if (!results['1 up'] || !results['1 dn']) {
-            notes.innerHTML = 'xix: 1 up/1 dn';
-            return;
-        }
-
-        Up = Up[0];
-        Dn = Dn[0];
-        
-        // compute rotation angle
-        let T = 1.57 - atan2(
-            Dn.yMax - Dn.yMin,
-            Dn.xMax - Dn.xMin
-        );
-        
-        // get points
-        let upPts = [
-            { x: Up.xMin, y: Up.yMax },
-            { x: Up.xMax, y: Up.yMin }
-            ,
-            { x: Dn.xMax, y: Dn.yMax }
-        ];
-        
-        // adjust to origin
-        upPts = upPts.map(p =>
-            ({'x': p.x - Dn.xMin, 'y': p.y - Dn.yMin})
-        );
-        
-        // rotate
-        upPts = upPts.map(p => {
-            return ({
-                'x': p.x * cos(T) - p.y * sin(T),
-                'y': p.x * sin(T) + p.y * cos(T)
-            });
-        });
-        
-        let b = upPts[1].y - upPts[1].x * (
-            (upPts[1].y - upPts[0].y)/
-            (upPts[1].x - upPts[0].x)
-        );
-        
-        const width  = Up.wide;
-        const height = Dn.high;
-        
-        results['width'] = (
-            width  > prefs.minSize && width  < prefs.maxSize
-        );
-        
-        results['heighth'] = (
-            height > prefs.minSize && height < prefs.maxSize
-        );
-        
-        results['crosses'] = (
-            sign(upPts[0].x) !== sign(upPts[1].x) &&
-            b > 0 && b < upPts[2].y
-        );
-
-        notes.innerHTML = '&nbsp;xix:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
-        }
-        
-        return(Object.values(results).every(v => v));
 
     },
     
-    // check-mark
+    // x mark
+    xix: d => {
+        
+        if (d.length !== 2) return false;
+        
+        const L = linz(d);
+        let results = {};
+        
+        L.forEach(LL =>
+            LL.getSlopes().getAtOrig().org.getTurns(true)
+        );
+        
+        const Up = L.filter(LL =>
+            LL.slopes.all < -0.2 &&
+            LL.slopes.all > -4.0
+        )[0];
+        
+        const Dn = L.filter(LL =>
+            LL.slopes.all >  0.2 &&
+            LL.slopes.all <  4.0
+        )[0];
+        
+        
+        if (!Up || !Dn) {
+            notes.innerHTML = 'xix: 1up|1dn'
+            return false;
+        }
+        
+        const wide = (
+            max(...Up.XXX, ...Dn.XXX) -
+            min(...Up.XXX, ...Dn.XXX)
+        );
+        
+        const high = (
+            max(...Up.YYY, ...Dn.YYY) -
+            min(...Up.YYY, ...Dn.YYY)
+        );
+        
+        //return (
+            
+            results['size'] =
+            wide > prefs.minSize && wide < 2*prefs.maxSize &&
+            high > prefs.minSize && high < 2*prefs.maxSize;
+            
+            
+            results['turns'] = (
+            Up.org.turns.x < 2 && Up.org.turns.y === 0 &&
+            Dn.org.turns.x < 2 && Dn.org.turns.y === 0)||(
+            Up.org.XXX.every(x => abs(x) < 5) &&
+            Dn.org.XXX.every(x => abs(x) < 5))
+            
+            results['cross'] =
+            Up.coor.slice(1).some((ci, i) =>
+            Dn.coor.slice(1).some((cj, j) =>
+                crss([
+                    Up.coor[i], ci,
+                    Dn.coor[j], cj
+                ])
+            ))
+            
+            /*
+            crss([
+                Up.coor[0], Up.coor.at(-1),
+                Dn.coor[0], Dn.coor.at(-1)
+            ])
+            */
+        
+        //);
+        notes.innerHTML = '&nbsp;xxix:: ';
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // still-do's {
+    
+    // check box
     chx: d => {
         
         let L = linz(d);
@@ -1022,6 +1138,8 @@ const tests = {
         L = L[0];
         L.getTurns(true);
         
+        //ratLine.setAttribute('d', L.makeSVG().svg);
+        
         results['turns'] =
         L.turns.x === 0 && L.turns.y === 1;
         
@@ -1034,7 +1152,7 @@ const tests = {
         
         let Up = L.getAtOrig(   L.turns.yPts[0][2]);
         
-            /*
+        /*
         ratLine.setAttribute('d',
             'M' +
             Dn.pts[0][0] +' '+ Dn.pts[0][1] +
@@ -1045,7 +1163,7 @@ const tests = {
             Up.pts.slice(1)
             .map(_ => 'L'+ _[0] +' '+ _[1] +' ').join('')
         );
-            */
+        */
         
         const wide = L.wide;
         const high = L.high;
@@ -1088,47 +1206,7 @@ const tests = {
         return(Object.values(results).every(v => v));
 
     },
-
-    // a slash, like this: /
-    sla: d => {
-        
-        let L = linz(d);
-        let results = {};
-
-        /*
-        ratLine.setAttribute('d',
-            L.map(_ => _.makeSVG().svg).join('')
-        );
-        */
-        
-        // there must be exactly one line
-        if (L.length !== 1) return false;
-        
-        L = L[0];
-        L.getTurns(true);
-
-        const width  = abs(L.xMax - L.xMin);
-        const height = abs(L.yMax - L.yMin);
-
-        results['size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-            
-        results['0 turns'] =
-        L.turns.x === 0 && L.turns.y === 0;
-        
-        results['x increases'] =
-        L.XXX[0] < L.XXX.at(-1);
-      //L.XXX.slice(1).every((x, i) => x - L.XXX[i] > -2);
-
-        results['y decreases'] =
-        L.YYY[0] > L.YYY.at(-1);
-      //L.YYY.slice(1).every((y, i) => y - L.YYY[i] <  2);
-
-        return(Object.values(results).every(v => v));
-
-    },
-    
+  
     // triple underline
     tri: d => {
         
@@ -1613,6 +1691,8 @@ const tests = {
         return(Object.values(results).every(v => v));
         
     }
+    
+    //}
 
 };
 
@@ -1620,10 +1700,9 @@ const tests = {
     
 // app methods {
 
-const linz = d => {
+const linz = (d, t=true) => {
     
-   //return d.split(/[^]M/).map(p => new LineObj(p));
-     return d.split(']').map(p => new LineObj(p));
+     return d.map(D => new LineObj(D, t));
         
 };
 
@@ -1662,6 +1741,24 @@ const mark = d => {
 
 };
 
+const crss = h => {
+
+    if (h.length < 4) return false;
+
+    let [a, b, c, d, p, q, r, s] = [...h.flat()];
+
+    let det = (c - a) * (s - q) - (r - p) * (d - b), gam, lam;
+    
+    if (det === 0) return false;
+    
+    lam = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+    gam = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+    
+    return ((0 < lam && lam < 1) && (0 < gam && gam < 1)) ?
+    [a + lam * (c - a), b + lam * (d - b)] : false;
+
+};
+
 const draw = e => {
 
     e.preventDefault();
@@ -1673,19 +1770,11 @@ const draw = e => {
     
     coordList.at(-1).push(new Point(e.pageX, e.pageY));
     
-
     let pts = [
         coordList.at(-1).at(-1),
         coordList.at(-1).at(-2)
     ].sort((a, b) => a.y - b.y);
 
-    let dist = sqrt(
-        (pts[0].x - pts[1].x) ** 2 +
-        (pts[0].y - pts[1].y) ** 2
-    );
-    
-    let W = prefs.penWidth;
-    
     const path = svg.lastChild;
     
     if(!path){
@@ -1697,8 +1786,8 @@ const draw = e => {
         path.setAttribute('d',
         (path.getAttribute('d')||'') + (
             
-            'M' + pts[0].RtoL(W) +
-            'L' + pts[1].LtoR(W) + 'Z'
+            'M' + pts[0].RtoL +
+            'L' + pts[1].LtoR + 'Z'
             
         ));
     } else {
@@ -1714,13 +1803,13 @@ const draw = e => {
                     )
                 ) ? (
     
-                    'M' + pts[0].RtoL(W) +
-                    'L' + pts[1].LtoR(W) + 'Z'
+                    'M' + pts[0].RtoL +
+                    'L' + pts[1].LtoR + 'Z'
     
                 ) : (
     
-                    'M' + pts[0].LtoR(W) +
-                    'L' + pts[1].RtoL(W) + 'Z'
+                    'M' + pts[0].LtoR +
+                    'L' + pts[1].RtoL + 'Z'
     
                 )
     
@@ -1730,12 +1819,13 @@ const draw = e => {
 };
     
 const down = e => {
-
+    
+    //e.preventDefault();
     notes.innerHTML = '&nbsp;';
 
     if (e.pageX > 0.8 * document.body.offsetWidth) {
         waiting = clearTimeout(waiting);
-        upp();
+        uppp(e);
         return;
     }
 
@@ -1758,7 +1848,9 @@ const down = e => {
         
     }
 
-    coordList.at(-1).push(new Point(e.pageX, e.pageY));
+    coordList.at(-1).push(
+        (new Point(e.pageX, e.pageY))
+    );
 
     e.target.releasePointerCapture(e.pointerId);
 
@@ -1766,7 +1858,9 @@ const down = e => {
 
 };
 
-const upp  = () => {
+const uppp = e => {
+    
+    //e.preventDefault();
     
     let path = svg.lastChild;
     
@@ -1784,7 +1878,7 @@ const upp  = () => {
 
 };
 
-const exam = () => {
+const exam = _ => {
 
     waiting = false;
     
@@ -1795,15 +1889,11 @@ const exam = () => {
         return;
     }
     
-    //const d = path.getAttribute('d');
-    const d = JSON.stringify(coordList)
-    .replace(/\]\]/g,'');
-    
-    //if (d.split('L').length < 2) complist = [];
+    const d = coordList.map(c => c.map(p => [p.x, p.y]));
     
     for (let CZ of compList) {
         
-        if (CZ.test(d, CZ)) {
+        if (CZ.test(d)) {
         
             CZ.divS.setProperty('text-decoration', 'line-through');
             CZ.box.classList.add('completed');
@@ -1843,9 +1933,9 @@ document.querySelectorAll('[data-czech]').forEach((CZ, i) =>
 
 // add lizzers {
 
-addLiz('pointerdown', down, { passive: false });
-addLiz('pointerup', upp, { passive: false });
-addLiz('pointercancel', upp, { passive: false });
+addLiz('pointerdown',   down, { passive: false });
+addLiz('pointerup',     uppp, { passive: false });
+addLiz('pointercancel', uppp, { passive: false });
 
 //}
 
