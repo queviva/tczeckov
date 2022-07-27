@@ -412,6 +412,12 @@ input[type=text] {
     
     <div id="sec">
         
+    <div id="88" class="qr" data-czech="xix">
+    &nbsp;eks shape:&nbsp;&nbsp;<b>&#215;</b>&nbsp;</div>
+    
+    <div id="888" class="qr" data-czech="pls">
+    &nbsp;plus sign:&nbsp;&nbsp;<b>+</b>&nbsp;</div>
+
     <div id="30" class="qr" data-czech="lup">
     &nbsp;delete werd werd:&nbsp;&nbsp;
     <div style="
@@ -449,10 +455,6 @@ input[type=text] {
     "
     ></span>
     ape:&nbsp;<b>&#8255;&#8272;</b></div>
-    
-    
-
-        
          
     <div id="30" class="qr" data-czech="sla">
     &nbsp;slasher:&nbsp;&nbsp;<b><i>/</i></b>&nbsp;</div>
@@ -461,6 +463,7 @@ input[type=text] {
     -->
     </div>
     
+    <hr>
     <div class="qr signature">~queviva</div>
     
 </div>
@@ -741,7 +744,6 @@ Tczech.prototype.reprep = function () {
 
 };
 
-
 //}
 
 // test methods {
@@ -759,7 +761,6 @@ const looper = (d, obj) => {
         let YYY = P.filter((_, i) => i % 2 === 1);
         
         if (XXX.length < 5) {
-            log('point-less');
             return false;
         }
     
@@ -971,6 +972,152 @@ const tests = {
         notes.innerHTML = '&nbsp;you:: ';
         for (let [k,v] of Object.entries(results)) {
             v || (notes.innerHTML += (k+', '));
+        }
+        
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // + sign
+    pls: d => {
+        
+        const L = linz(d);
+        let results = {};
+
+        // there must be exactly two lines
+        if (L.length !== 2) {
+            notes.innerHTML = 'plus: 2 lines';
+            return false;
+        }
+        
+        let Vz = L.filter(LL =>
+            LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
+        );
+        
+        let Hz = L.filter(LL =>
+            LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
+        );
+        
+        results['1 vert'] = Vz.length === 1;
+        results['1 horz'] = Hz.length === 1;
+        
+        if (!results['1 vert'] || !results['1 horz']) {
+            notes.innerHTML = 'plus: 1 hor/1 vert';
+            return;
+        }
+
+        Vz = Vz[0];
+        Hz = Hz[0];
+        
+        const width  = Hz.wide;
+        const height = Vz.high;
+        
+        results['width'] = (
+            width  > prefs.minSize && width  < prefs.maxSize
+        );
+        
+        results['heighth'] = (
+            height > prefs.minSize && height < prefs.maxSize
+        );
+
+        results['turns'] = (
+            Hz.getTurns(true).turns.y < 2 &&
+            Vz.getTurns(true).turns.x < 2
+        );
+
+        results['hor cross'] = (
+            abs(Hz.yMax - (Vz.yMax + Vz.yMin)/2)
+            < 0.15 * height
+        );
+
+        results['vert cross'] = (
+            Vz.xMax > Hz.xMin && Vz.xMax < Hz.xMax
+        );
+        
+        notes.innerHTML = '&nbsp;plus:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
+        }
+        return(Object.values(results).every(v => v));
+
+    },
+
+    // x marx
+    xix: d => {
+        
+        const L = linz(d);
+        let results = {};
+        
+        // there must be exactly two lines
+        if (L.length !== 2) {
+            notes.innerHTML = 'xix: 2 lines';
+            return false;
+        }
+        
+        L.forEach(LL => LL.getSlopes());
+        
+        let Up = L.filter(LL =>
+            LL.slopes.val.every(s => s < 0)
+        );
+        
+        let Dn = L.filter(LL =>
+            LL.slopes.val.every(s => s > 0)
+        );
+        
+        results['1 up'] = Up.length === 1;
+        results['1 dn'] = Dn.length === 1;
+        
+        if (!results['1 up'] || !results['1 dn']) {
+            notes.innerHTML = 'xix: 1 up/1 dn';
+            return;
+        }
+
+        Up = Up[0];
+        Dn = Dn[0];
+        
+        // compute rotation angle
+        let T = 1.57 - atan2(
+            Dn.yMax - Dn.yMin,
+            Dn.xMax - Dn.xMin
+        );
+        
+        // get points
+        let upPts = [
+            { x: Up.xMin, y: Up.yMax },
+            { x: Up.xMax, y: Up.yMin }
+        ];
+        
+        // adjust to origin
+        upPts = upPts.map(p =>
+            ({'x': p.x - Dn.xMin, 'y': p.y - Dn.yMin})
+        );
+        
+        // rotate
+        upPts = upPts.map(p => {
+            let x = p.x, y = p.y;
+            return ({
+                'x': x * cos(T) - y * sin(T),
+                'y': x * sin(T) + y * cos(T)
+            });
+        });
+        
+        const wide = Up.wide;
+        const high = Dn.high;
+        
+        results['wide'] =
+        wide > prefs.minSize && wide < prefs.maxSize;
+        
+        results['high'] =
+        high > prefs.minSize && high < prefs.maxSize;
+        
+        results['crosses'] =
+        sign(upPts[0].x) !== sign(upPts[1].x);
+
+        notes.innerHTML = '&nbsp;xix:: ';
+        
+        for (let [k,v] of Object.entries(results)) {
+            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
         }
         
         return(Object.values(results).every(v => v));
