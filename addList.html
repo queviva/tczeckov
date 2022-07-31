@@ -446,9 +446,9 @@ path {
     
     <div>
         
-    <div id="30x" class="qr" data-czech="crs">
+    <div id="30x" class="qr" data-czech="scr">
     &nbsp;
-    any two crossed
+    self crossing
     &nbsp;&nbsp;
     <b><i>
         &#8734;
@@ -720,7 +720,9 @@ LineObj.prototype.getSelfXs = function () {
     
         let p = crss([this.coor[i],ci,this.coor[i+j+2],cj]);
         
-        if (p) this.crosses.push(new Point(...p));
+        if (p) this.crosses.push(
+            {id1: i, id2: i+j+2, x: p[0], y: p[1]}
+        );
     
     })});
     
@@ -1010,6 +1012,46 @@ const tests = {
 
     //}
     
+    inf: d => {
+    
+        if (d.length > 1) return;
+    
+        let L = linz(d)[0].getSelfXs().getTurns(true);
+    
+        L.crosses = L.crosses.filter(p =>
+            abs(p.x - L.xMin - L.wide / 2) < 0.1 * L.wide
+        );
+    
+        return (
+            L.wide > 40 &&
+            L.crosses.length > 0 &&
+            L.crosses.length < 3 &&
+            L.turns.x > 0 &&
+            L.turns.x < 3 &&
+            L.turns.y > 2 &&
+            L.turns.y < 5
+        );
+    
+    },
+    
+    mul: d => {
+
+        let T = Object.fromEntries(`
+        
+        tri xix crs scr pls und
+        
+        `.trim().split(/\s+/).map((v, i) =>
+            [v, tests[v](d.slice(0, [3,2,2,1,2,1][i]))]
+        ));
+        
+        notes.innerHTML = '&nbsp;'
+        for (let [k,v] of Object.entries(T)) {
+            notes.innerHTML += (k + ':'+ v +'&nbsp;&nbsp;');
+        }
+        
+        
+        return false;
+    },
     
     // x mark
     OLDxix: d => {
@@ -1053,71 +1095,66 @@ const tests = {
         let results = {};
         
         L.forEach(LL =>
-            LL.getSlopes().getAtOrig().org.getTurns(true)
+            LL.getSlopes().getTurns(true)
+            .getAtOrig().org.getTurns(true)
         );
         
         const Up = L.filter(LL =>
-            LL.slopes.all < -0.2 &&
-            LL.slopes.all > -4.0
+            LL.slopes.all < -0.2 && LL.slopes.all > -4.0
         )[0];
         
         const Dn = L.filter(LL =>
-            LL.slopes.all >  0.2 &&
-            LL.slopes.all <  4.0
+            LL.slopes.all >  0.2 && LL.slopes.all <  4.0
         )[0];
         
-        
         if (!Up || !Dn) {
-            notes.innerHTML = 'xix: 1up|1dn'
+            notes.innerHTML = 'up dn';
             return false;
         }
         
-        const wide = (
-            max(...Up.XXX, ...Dn.XXX) -
-            min(...Up.XXX, ...Dn.XXX)
-        );
+        let iSec = {};
         
-        const high = (
-            max(...Up.YYY, ...Dn.YYY) -
-            min(...Up.YYY, ...Dn.YYY)
-        );
-        
-        //return (
-            
-            results['size'] =
-            wide > prefs.minSize && wide < 2*prefs.maxSize &&
-            high > prefs.minSize && high < 2*prefs.maxSize;
-            
-            
-            results['turns'] = (
-            Up.org.turns.x < 2 && Up.org.turns.y === 0 &&
-            Dn.org.turns.x < 2 && Dn.org.turns.y === 0)||(
-            Up.org.XXX.every(x => abs(x) < 5) &&
-            Dn.org.XXX.every(x => abs(x) < 5))
-            
-            results['cross'] =
-            Up.coor.slice(1).some((ci, i) =>
+        Up.coor.slice(1).some((ci, i) =>
             Dn.coor.slice(1).some((cj, j) =>
-                crss([
-                    Up.coor[i], ci,
-                    Dn.coor[j], cj
+                iSec.pt = crss([
+                    Up.coor[i], ci, Dn.coor[j], cj
                 ])
-            ))
+            )
+        )
+        
+        if (!iSec.pt) return;
             
-            /*
-            crss([
-                Up.coor[0], Up.coor.at(-1),
-                Dn.coor[0], Dn.coor.at(-1)
-            ])
-            */
+        const [wide, high] = [(
+            (iSec.xMax = max(...Up.XXX, ...Dn.XXX)) -
+            (iSec.xMin = min(...Up.XXX, ...Dn.XXX))),(
+            (iSec.yMax = max(...Up.YYY, ...Dn.YYY)) -
+            (iSec.yMin = min(...Up.YYY, ...Dn.YYY))
+        )];
+         
+        return (
+            
+            wide > prefs.minSize && wide < prefs.maxSize &&
+            high > prefs.minSize && high < prefs.maxSize &&
+            
+        (
+            (
+             (Up.org.turns.x < 2 && Up.org.turns.y === 0)||
+              Up.org.XXX.every(x => abs(x) < 5)
+            )&&(
+             (Dn.org.turns.x < 3 && Dn.org.turns.y === 0)||
+              Dn.org.XXX.every(x => abs(x) < 5)
+            )
+        ) &&
+            
+            abs(iSec.pt[0] - (iSec.xMin + wide / 2))
+            < 0.2 * wide &&
+            abs(iSec.pt[1] - (iSec.yMin + high / 2))
+            < 0.2 * high
+            
+        ) &&
         
-        //);
-        notes.innerHTML = '&nbsp;xxix:: ';
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
+        iSec.pt[0] - Up.xMin > 0.3 * wide
+        iSec.pt[0] - Dn.xMin > 0.3 * wide;
 
     },
 
@@ -1697,7 +1734,96 @@ const tests = {
 };
 
 //}
-    
+
+// animated cross check {
+const crossCheck = new function () {
+
+    let iCount = 1;
+    let jCount = 3;
+    let checkLine = [];
+    let interPts = [];
+    let loop = null;
+
+    const check = () => {
+
+        if (iCount < checkLine.coor.length - 2) {
+
+            ratLine.setAttribute('d',
+                'M' + checkLine.coor[iCount].join(' ') +
+                'L' + checkLine.coor[iCount - 1].join(' ')
+            );
+
+            if (jCount < checkLine.coor.length) {
+
+                ratPath.setAttribute('d',
+                    'M' + checkLine.coor[jCount].join(' ') +
+                    'L' + checkLine.coor[jCount - 1].join(' ')
+                );
+
+                let pt = crss([
+                    checkLine.coor[iCount - 1],
+                    checkLine.coor[iCount],
+                    checkLine.coor[jCount - 1],
+                    checkLine.coor[jCount]
+                ]);
+
+                if (pt) {
+                    log('got one');
+                    interPts.push({ x: pt[0], y: pt[1], i: iCount, j: jCount });
+                }
+
+                jCount++;
+                loop = setTimeout(check, 0);
+
+            }
+            else {
+
+                iCount++;
+                jCount = iCount + 2;
+                loop = setTimeout(check, 0);
+
+            }
+
+        }
+        else {
+            loop = null;
+            ratLine.setAttribute('d', '');
+            ratPath.setAttribute('d', '');
+            interPts.forEach(p => {
+                ratPath.setAttribute('d',
+                    ratPath.getAttribute('d') +
+                    'M' + checkLine.coor[p.i].join(' ') +
+                    'L' + checkLine.coor[p.i - 1].join(' ') +
+                    'M' + checkLine.coor[p.j].join(' ') +
+                    'L' + checkLine.coor[p.j - 1].join(' ')
+                );
+
+                let lip = document.createElementNS(NS, 'ellipse');
+                lip.setAttribute('cx', p.x);
+                lip.setAttribute('cy', p.y);
+                lip.setAttribute('rx', 5);
+                lip.setAttribute('ry', 5);
+                lip.setAttribute('fill', '#fb0');
+                lipGroup.append(lip);
+            });
+        }
+
+    };
+
+    this.test = d => {
+        iCount = 1;
+        jCount = 3;
+        interPts = [];
+        checkLine = linz(d)[0];
+        lipGroup.innerHTML = '';
+        loop = clearTimeout(loop);
+        check();
+    };
+
+}();
+
+// }
+
 // app methods {
 
 const linz = (d, t=true) => {
@@ -1745,6 +1871,7 @@ const crss = h => {
 
     if (h.length < 4) return false;
 
+    //* foxxy method *//
     let [a, b, c, d, p, q, r, s] = [...h.flat()];
 
     let det = (c - a) * (s - q) - (r - p) * (d - b), gam, lam;
