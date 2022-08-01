@@ -446,13 +446,11 @@ path {
     
     <div>
         
-    <div id="30x" class="qr" data-czech="scr">
+    <div id="30" class="qr" data-czech="ups">
     &nbsp;
-    self crossing
+    up stroke:
     &nbsp;&nbsp;
-    <b><i>
-        &#8734;
-    </i></b>&nbsp;</div>
+    <b><i>|</i></b>&nbsp;</div>
      
     <div id="xiix" class="qr" data-czech="xix">
     &nbsp;marx the spot&nbsp;&nbsp;
@@ -517,6 +515,7 @@ const fix = (...v) => console.log(v.map(x =>
     typeof x === 'number' ? x.toFixed(1) :
     typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
 ).join(' '));
+const clog = v => (console.log(v), true);
 ////////////////////////////////////////////////////////}
 
 new function() {
@@ -584,7 +583,7 @@ function Point (x, y) {
     
 function LineObj (d, filt=true) {
 
-    this.coor = d;
+    this.coor = [...d];
     
     let XXX = d.map(_ => _[0]);
     let YYY = d.map(_ => _[1]);
@@ -726,31 +725,21 @@ LineObj.prototype.getSelfXs = function () {
     
     })});
     
-    /*
-    lipGroup.innerHTML = '';
-    this.crosspt.forEach(pt => {
-        let lip = document.createElementNS(NS,'ellipse');
-        lip.setAttribute('fill', 'var(--darkness)');
-        lip.setAttribute('rx', 10);
-        lip.setAttribute('ry', 10);
-        lip.setAttribute('cx', pt.x);
-        lip.setAttribute('cy', pt.y);
-        lipGroup.append(lip);
-    });
-    ratPath.setAttribute('d', '');
-    ratLine.setAttribute('d',
-        this.crosses.map(c =>
-            'M' + c[0].x + ' ' + c[0].y +
-            'L' + c[1].x + ' ' + c[1].y +
-            'M' + c[2].x + ' ' + c[2].y +
-            'L' + c[3].x + ' ' + c[3].y
-   
-        ).join('')
-    );
-    //*/
-    
     return this;
     
+};
+
+LineObj.prototype.hasSelfXs = function () {
+
+    let p = false;
+
+    this.coor.slice(1, -2).some((ci, i) =>
+    this.coor.slice(i + 3).some((cj, j) =>
+        p = crss([this.coor[i], ci, this.coor[i + j + 2], cj])
+    ));
+    
+    return p;
+
 };
 
 LineObj.prototype.getAtOrig = function (a=0, b=null) {
@@ -787,13 +776,12 @@ LineObj.prototype.getAtOrig = function (a=0, b=null) {
 
 LineObj.prototype.makeSVG = function () {
     
-    this.svg = 'M'+ this.coor[0][0] +
-               ' '+ this.coor[0][1];
+    this.svg = 'M'+ this.coor[0].join(' ');
         
     this.coor.slice(1).forEach((_, i) => {
-    
-        this.svg += 'L' + this.coor[i + 1][0] +
-                    ' ' + this.coor[i + 1][1]
+        
+        this.svg += 'L' + this.coor[i + 1].join(' ');
+        
     });
     
     return this;
@@ -993,24 +981,98 @@ const tests = {
         );
 
     },
-   
-    // self crossing
-    scr: d => {
-    
+
+    // remove-werd loop
+    lup: d => {
+        
         if (d.length !== 1) return false;
         
-        const L = linz(d)[0];
+        let L = linz(d)[0].getTurns(true).getSelfXs();
         
         return (
-            L.coor.slice(1, -2).some((ci, i) =>
-            L.coor.slice(i + 3).some((cj, j) =>
-                crss([L.coor[i], ci, L.coor[i+j+2], cj])
-            ))
+            
+            L.turns.x === 2 &&
+            L.turns.y === 1 &&
+            L.crosses.length === 1 &&
+            
+            L.wide > prefs.minSize &&
+            L.wide < prefs.maxSize &&
+            L.high > prefs.minSize &&
+            L.high < prefs.maxSize &&
+        
+            abs(L.XXX[0] - L.xMin) < 0.01 * L.high &&
+        
+            L.YYY.at(-1) < L.YYY[0] &&
+        
+            L.crosses[0].x - L.XXX[0] > 0.5 * L.wide &&
+            L.YYY[0] - L.crosses[0].y > 0.5 * L.high &&
+        
+            L.turns.yPts[0][1] < L.turns.xPts[0][1]
+        
         );
+        
+    },
     
+    // multiple tests
+    mul: d => {
+
+        let T = Object.fromEntries(`
+        
+        tri xix crs scr pls und
+        
+        `.trim().split(/\s+/).map((v, i) =>
+            [v, tests[v](d.slice(0, [3,2,2,1,2,1][i]))]
+        ));
+        
+        return(Object.values(T).every(v => v));
+        
     },
 
+    // check box
+    chx: d => {
+        
+        let L, Dn, Up;
+        
+        return (
+            
+            d.length === 1 &&
+            
+            (d[0].at(-1)[0] > d[0][0][0] || d[0].reverse()) &&
+            
+            (L = linz(d)[0].getTurns(true)) &&
+            
+            L.turns.x < 2 && L.turns.y === 1 &&
+                    
+            L.wide > prefs.minSize &&
+            L.wide < prefs.maxSize &&
+            L.high > prefs.minSize &&
+            L.high < prefs.maxSize &&
+            
+            (Dn = {
+                ...L.getAtOrig(0, L.turns.yPts[0][2] + 1).org
+            },
+            Up = {
+                ...L.getAtOrig(L.turns.yPts[0][2]).org
+            }, true ) &&
+
+            Up.len > 1.6 * Dn.len &&
+            
+            L.turns.yPts[0][1] - L.YYY[0] > 0.2 * L.high &&
+            
+            Dn.coor.every(p => -3 < p[0] && p[0] < 5) &&
+        
+            Up.coor.every(p => -3 < p[0] && p[0] < 10) &&
+            
+            Dn.ang - Up.ang > 1.5
+
+        );
+
+    },
+ 
     //}
+        
+        
+    // still-do's {
     
     inf: d => {
     
@@ -1033,26 +1095,7 @@ const tests = {
         );
     
     },
-    
-    mul: d => {
 
-        let T = Object.fromEntries(`
-        
-        tri xix crs scr pls und
-        
-        `.trim().split(/\s+/).map((v, i) =>
-            [v, tests[v](d.slice(0, [3,2,2,1,2,1][i]))]
-        ));
-        
-        notes.innerHTML = '&nbsp;'
-        for (let [k,v] of Object.entries(T)) {
-            notes.innerHTML += (k + ':'+ v +'&nbsp;&nbsp;');
-        }
-        
-        
-        return false;
-    },
-    
     // x mark
     OLDxix: d => {
         
@@ -1158,92 +1201,7 @@ const tests = {
 
     },
 
-    // still-do's {
-    
-    // check box
-    chx: d => {
-        
-        let L = linz(d);
-        let results = {};
 
-        // there must be exactly one line
-        if (L.length !== 1) {
-            notes.innerHTML = 'check:: 1 line';
-            return false;
-        }
-        
-        L = L[0];
-        L.getTurns(true);
-        
-        //ratLine.setAttribute('d', L.makeSVG().svg);
-        
-        results['turns'] =
-        L.turns.x === 0 && L.turns.y === 1;
-        
-        if(!results['turns']) {
-            notes.innerHTML='check:: turns'
-            return;
-        }
-        
-        let Dn = L.getAtOrig(0, L.turns.yPts[0][2] + 1);
-        
-        let Up = L.getAtOrig(   L.turns.yPts[0][2]);
-        
-        /*
-        ratLine.setAttribute('d',
-            'M' +
-            Dn.pts[0][0] +' '+ Dn.pts[0][1] +
-            Dn.pts.slice(1)
-            .map(_ => 'L'+ _[0] +' '+ _[1] +' ').join('')
-            'M' +
-            Up.pts[0][0] +' '+ Up.pts[0][1] +
-            Up.pts.slice(1)
-            .map(_ => 'L'+ _[0] +' '+ _[1] +' ').join('')
-        );
-        */
-        
-        const wide = L.wide;
-        const high = L.high;
-
-        results['size'] =
-        wide > prefs.minSize && wide < prefs.maxSize &&
-        high > prefs.minSize && high < prefs.maxSize;
-        
-        results['direction'] =
-        L.XXX[0] < L.XXX.at(-1);
-
-        results['up longer'] =
-        L.YYY[0] - L.YYY.at(-1) > 0.2 * high ||
-        Up.len > 2 * Dn.len;
-        
-        results['turn lower'] =
-        L.turns.yPts[0][1] - L.YYY[0] > 0.1 * high;
-        
-        /*
-        results['turn close to start'] =
-        L.turns.yPts[0][0] - L.XXX[0] < 0.6 * wide;
-        */
-        
-        results['angle'] =
-        Dn.ang - Up.ang > 1.2;
-        //(180 * Dn.ang / Math.PI) -
-        //(180 * Up.ang / Math.PI) > 70;
-        
-        results['dn strait'] =
-        Dn.pts.every(p => -3 < p[0] && p[0] < 5);
-        
-        results['up strait'] =
-        Up.pts.every(p => -3 < p[0] && p[0] < 10);
-        
-        notes.innerHTML = '&nbsp;check:: ';
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
-
-    },
-  
     // triple underline
     tri: d => {
         
@@ -1484,94 +1442,7 @@ const tests = {
         return Object.values(results).every(v => v);
        
     },
-    
-    // remove-werd loop
-    lup: d => {
-        
-        let L = linz(d);
-        let results = {};
-        
-        L[0].getTurns();
-        
-        /*
-        ratLine.setAttribute('d',
-            L.map(_ => _.makeSVG().svg).join('')
-        );
-        */
-        
-        // there must be exactly one line
-        if (L.length !== 1) return false;
-        L = L[0];
-
-        /*
-        let tmp = ''; //{
-        if (L.turns.x) {
-            Q = L.turns.xPts;
-            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
-            
-            if (Q.length > 1) {
-                Q.slice(1).forEach(q =>
-                    tmp += 'L' + q[0] + ' ' + q[1]
-                );
-            }
-            
-        }
-        if (L.turns.y) {
-            Q = L.turns.yPts;
-            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
-            
-            if (Q.length > 1) {
-                Q.slice(1).forEach(q =>
-                    tmp += 'L' + q[0] + ' ' + q[1]
-                );
-            }
-            
-        }
-        if (L.turns.x || L.turns.y) {
-            ratPath.setAttribute('d', tmp);
-        } //}
-        */
-        
-        L.getTurns(true);
-        
-        // and precisely two x, one y turns
-        if (L.turns.x !== 2 || L.turns.y !== 1) return false;
-        
-        const width  = abs(L.xMax - L.xMin);
-        const height = abs(L.yMax - L.yMin);
-
-        results['size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-        
-        results['1st is xmin'] =
-        abs(L.XXX[0] - L.xMin) < 0.1 * height;
-        
-        results['last higher'] =
-        L.YYY.at(-1) < L.YYY[0];
-        
-        results['flexions'] =
-        L.turns.xPts[0][0] > L.xMin &&
-        L.turns.xPts[0][1] < L.YYY[0] &&
-        L.turns.yPts[0][0] - L.turns.xPts[0][0] < -5 &&
-        L.turns.yPts[0][0] > L.turns.xPts[1][0];
-        
-        results['end past turn'] =
-      //L.turns.xPts[0][0] < L.XXX.at(-1);
-        L.XXX.at(-1) - L.turns.xPts[0][0] > -5;
-        
-
-        
-        notes.innerHTML = '&nbsp;loop:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
-        }
-        
-        return(Object.values(results).every(v => v));
-        
-    },
-    
+   
     // missing period
     per: d => {
         
