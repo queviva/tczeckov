@@ -446,14 +446,16 @@ path {
     
     <div>
         
-    <div id="30" class="qr" data-czech="ups">
+    <div id="30" class="qr" data-czech="you">
     &nbsp;
-    up stroke:
+    you&nbsp;&nbsp;&nbsp;&nbsp;shape
     &nbsp;&nbsp;
-    <b><i>|</i></b>&nbsp;</div>
+    <b><i>
+        &#8255;
+    </i></b>&nbsp;</div>
      
     <div id="xiix" class="qr" data-czech="xix">
-    &nbsp;marx the spot&nbsp;&nbsp;
+    &nbsp;marx the spot:&nbsp;&nbsp;
     <b><i>&#215;</i></b>&nbsp;</div>
     
     </div>
@@ -496,7 +498,7 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g id="ratGroup" transform="translate(0 0)">
+    <g id="ratGroup" transform="translate(100 100)">
         <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
@@ -515,7 +517,7 @@ const fix = (...v) => console.log(v.map(x =>
     typeof x === 'number' ? x.toFixed(1) :
     typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
 ).join(' '));
-const clog = v => (console.log(v), true);
+const clog = (...v) => (console.log(v), true);
 ////////////////////////////////////////////////////////}
 
 new function() {
@@ -857,11 +859,13 @@ const tests = {
     // | up stroke
     ups: d => {
         
-        if (d.length !== 1) return false;
-                
-        const L = linz(d, 0)[0].getTurns(true).getAtOrig();
+        let L;
         
         return (
+            
+            d.length === 1 &&
+            
+            (L = linz(d, 0)[0].getTurns(true).getAtOrig()) &&
             
             L.wide < 10 &&
             L.high > 20 && L.high < 2 * prefs.maxSize &&
@@ -875,12 +879,12 @@ const tests = {
     // | dn stroke
     dns: d => {
         
-        if (d.length !== 1) return false;
-                
-        const L = linz(d, 0)[0].getTurns(true).getAtOrig();
+        let L;
         
         return (
             
+            d.length === 1 &&
+            (L = linz(d, 0)[0].getTurns(true).getAtOrig()) &&
             L.wide < 10 &&
             L.high > 20 && L.high < 2 * prefs.maxSize &&
             L.turns.x === 0 && L.turns.y === 0 &&
@@ -893,12 +897,12 @@ const tests = {
     // _ underline
     und: d => {
                 
-        if (d.length !== 1) return false;
-        
-        const L = linz(d)[0].getTurns(true).getAtOrig();
+        let L;
         
         return (
             
+            d.length === 1 &&
+            (L = linz(d)[0].getTurns(true).getAtOrig()) &&
             L.wide > 20 && L.wide < 2 * prefs.maxSize &&
             L.high < 0.1 * L.wide &&
             L.turns.x === 0 && L.turns.y < 2
@@ -910,11 +914,13 @@ const tests = {
     // / slash
     sla: d => {
         
-        if (d.length !== 1) return false;
+        let L;
         
-        const L = linz(d)[0].getTurns(true);
-
         return (
+            
+            d.length === 1 &&
+            
+            (L = linz(d)[0].getTurns(true).getSlopes()) &&
             
             L.wide > prefs.minSize &&
             L.wide < prefs.maxSize &&
@@ -923,11 +929,8 @@ const tests = {
             
             L.turns.x === 0 &&
             L.turns.y === 0 &&
-        
-            (L.XXX[0] < L.XXX.at(-1) &&
-             L.YYY[0] > L.YYY.at(-1))||
-            (L.XXX[0] > L.XXX.at(-1) &&
-             L.YYY[0] < L.YYY.at(-1))
+            
+            L.slopes.val.every(s => -3 < s && s < -0.3)
              
         );
 
@@ -936,21 +939,23 @@ const tests = {
     // + sign
     pls: d => {
         
-        if (d.length !== 2) return false;
-        
-        const L = linz(d);
-        
-        const Vt = L.filter(LL =>
-            LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
-        )[0];
-        
-        const Hz = L.filter(LL =>
-            LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
-        )[0];
-        
-        if(!Vt || !Hz) return false;
+        let L, Vt, Hz;
 
         return (
+            
+            d.length === 2 &&
+            
+            (L = linz(d),
+            
+            Vt = L.filter(LL =>
+                LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
+            )[0],
+            
+            Hz = L.filter(LL =>
+                LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
+            )[0],
+            
+            Vt && Hz) &&
 
             Hz.wide > prefs.minSize &&
             Hz.wide < prefs.maxSize &&
@@ -960,7 +965,7 @@ const tests = {
             abs(Hz.yMax - Vt.yMin - Vt.high/2)
             < 0.15 * Vt.high &&
             
-            Vt.xMax > Hz.xMin && Vt.xMax < Hz.xMax
+            Hz.xMin < Vt.xMax && Vt.xMax < Hz.xMax
             
         );
         
@@ -969,11 +974,11 @@ const tests = {
     // two lines cross
     crs: d => {
         
-        if (d.length !== 2) return false;
-        
-        const L = linz(d);
+        let L;
         
         return (
+            d.length === 2 &&
+            (L = linz(d)) &&
             L[0].coor.slice(1).some((ci, i) =>
             L[1].coor.slice(1).some((cj, j) =>
                 crss([L[0].coor[i], ci, L[1].coor[j], cj])
@@ -985,11 +990,13 @@ const tests = {
     // remove-werd loop
     lup: d => {
         
-        if (d.length !== 1) return false;
-        
-        let L = linz(d)[0].getTurns(true).getSelfXs();
+        let L;
         
         return (
+            
+            d.length === 1 &&
+            
+            (L = linz(d)[0].getTurns(true).getSelfXs()) &&
             
             L.turns.x === 2 &&
             L.turns.y === 1 &&
@@ -1068,34 +1075,179 @@ const tests = {
         );
 
     },
- 
-    //}
         
-        
-    // still-do's {
-    
+    // infinity symbol
     inf: d => {
     
-        if (d.length > 1) return;
-    
-        let L = linz(d)[0].getSelfXs().getTurns(true);
-    
-        L.crosses = L.crosses.filter(p =>
-            abs(p.x - L.xMin - L.wide / 2) < 0.1 * L.wide
-        );
+        let L;
     
         return (
-            L.wide > 40 &&
-            L.crosses.length > 0 &&
-            L.crosses.length < 3 &&
-            L.turns.x > 0 &&
-            L.turns.x < 3 &&
-            L.turns.y > 2 &&
-            L.turns.y < 5
+            
+            d.length === 1 &&
+            
+            (L = linz(d)[0].getSelfXs().getTurns(true)) &&
+            
+            L.wide > 40 && L.wide < 2 * prefs.maxSize &&
+            
+            (L.crosses = L.crosses.filter(p =>
+                abs(p.x - L.xMin - L.wide / 2) < 0.1 * L.wide
+            )) &&
+    
+            0 < L.crosses.length && L.crosses.length < 3 &&
+            
+            abs((
+                L.YYY[L.XXX.indexOf(L.xMax)] -
+                L.YYY[L.XXX.indexOf(L.xMin)]) / L.wide
+            ) < 0.2 &&
+            
+            0 < L.turns.x && L.turns.x < 3 &&
+            2 < L.turns.y && L.turns.y < 5
+            
         );
     
     },
 
+    // triple underline
+    tri : d => {
+        
+        let L;
+        
+        return (
+            
+            d.length === 3 &&
+            
+            (L = linz(d).sort((a, b) => a.yMax - b.yMax)) &&
+            
+            L[2].yMax - L[0].yMin < prefs.maxSize &&
+            
+            L.every((LL, i) => ( LL.getTurns(true),
+                
+                    LL.turns.x === 0 &&
+                    LL.turns.y < 2 &&
+                    LL.wide > prefs.minSize &&
+                    LL.wide < prefs.maxSize &&
+                    LL.high < 0.5 * LL.wide
+                    
+            )) &&
+            
+            L.slice(1).every((LL, i) => (
+                
+                    abs(L[0].xMin - LL.xMin)
+                    < 0.6 * L[0].wide &&
+                    
+                    abs(L[0].xMax - LL.xMax)
+                    < 0.6 * L[0].wide &&
+                    
+                    LL.yMax - L[0].yMax
+                    > i * prefs.penWidth
+                    
+            )) &&
+            
+            L.slice(1).every(LL =>
+                !L[0].coor.slice(1).some((ci, i) =>
+                LL.coor.slice(1).some((cj, j) =>
+                crss([L[0].coor[i], ci, LL.coor[j], cj])
+            )))
+            
+        );
+        
+    },
+
+    // # mark
+    has: d => {
+        
+        let L, Vt, Hz, wide, high;
+        
+        return (
+            
+            d.length === 4 &&
+            
+            (
+                L = linz(d),
+                Vt = L.filter(LL =>
+                    LL.getTurns(true).turns.y === 0 &&
+                    LL.turns.x < 2 &&
+                    LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)
+                ),
+                Hz = L.filter(LL =>
+                    LL.turns.x === 0 &&
+                    LL.turns.y < 2 &&
+                    LL.YYY.every(y => abs(LL.YYY[0] - y) < 20)
+                )
+            ) &&
+            
+            Vt.length === 2 && Hz.length === 2 &&
+            
+            (wide = abs(
+                max(Hz[0].xMax, Hz[1].xMax) -
+                min(Hz[0].xMin, Hz[1].xMin)
+            ),high = abs(
+                max(Vt[0].yMax, Vt[1].yMax) -
+                min(Vt[0].yMin, Vt[1].yMin)
+            )) &&
+            
+            wide > prefs.minSize && wide < prefs.maxSize &&
+            high > prefs.minSize && high < prefs.maxSize &&
+            
+            hitz(Hz[0], Vt[0]) &&
+            hitz(Hz[0], Vt[1]) &&
+            hitz(Hz[1], Vt[0]) &&
+            hitz(Hz[1], Vt[1]) &&
+            
+            abs(Hz[0].yMax - Hz[1].yMax) > prefs.penWidth &&
+            abs(Vt[0].xMax - Vt[1].xMax) > prefs.penWidth
+            
+        );
+        
+    },
+
+    //}
+
+    // u-shaped curve
+    you: d => {
+        
+        let L, Dn, Up;
+        
+        return (
+            
+            d.length === 1 &&
+            
+            (L = linz(d)[0].getTurns(true)) &&
+        
+            L.wide > prefs.minSize &&
+            L.wide < prefs.maxSize &&
+            L.high > 0.2 * L.wide  &&
+            
+            L.turns.x < 3 &&
+            L.turns.y === 1 &&
+            
+           (L.YYY[0] === L.yMin || L.YYY.at(-1) === L.yMin) &&
+            
+            abs(L.YYY[0] - L.YYY.at(-1)) < 0.3 * L.wide &&
+            
+            (Dn = linz([
+                L.coor.slice(0, L.turns.yPts[0][2]),
+                L.coor.slice(   L.turns.yPts[0][2])
+            ])) &&
+            
+            Dn.every(LL => {
+                
+                LL.getAtOrig().org;
+                
+                return ((
+                    LL.coor[0][0] < LL.coor.at(-1)[0] ?
+                   -LL.org.xMin : LL.org.xMax)
+                    > 0.1 * LL.org.len
+                )
+                
+            })
+            
+        );
+
+    },
+  
+    // still-do's {
+    
     // x mark
     OLDxix: d => {
         
@@ -1198,164 +1350,6 @@ const tests = {
         
         iSec.pt[0] - Up.xMin > 0.3 * wide
         iSec.pt[0] - Dn.xMin > 0.3 * wide;
-
-    },
-
-
-    // triple underline
-    tri: d => {
-        
-        const L = linz(d).sort((a, b) => a.yMax - b.yMax);
-        let results = {};
-        
-        const width  = L[0].xMax - L[0].xMin;
-      //const height = L[0].yMax - L[0].yMin;
-      
-        const mu = L[0].YYY.reduce((a,b)=>a+b)/L[0].YYY.length;
-      
-        results['three lines'] = L.length === 3;
-       
-        results['valid size'] =
-        width  > prefs.minSize && width  < prefs.maxSize;
-        
-        results['lines flat'] =
-        L.every(_ => _.YYY.every(y => abs(_.YYY[0]-y)<10));
-        
-        results['stacked'] =
-        L.slice(1).every((_, i) => {
-            let m = _.YYY.reduce((a,b)=>a+b)/_.YYY.length;
-            return m > mu && m - mu > 4 * i
-        });
-        
-        results['same size'] =
-        L.slice(1).every((_, i) =>
-            abs(width - (_.xMax - _.xMin)) < 0.5 * width
-        );
-
-        results['lined up'] =
-        L.slice(1).every((_, i) =>
-            abs(_.xMin - L[0].xMin) < 0.5 * width
-        );
-        
-        notes.innerHTML = '&nbsp;trip:: ';
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
-
-    },
-
-    // u-shaped curve
-    you: d => {
-        
-        let L = linz(d);
-        let results = {};
-        
-        //ratLine.setAttribute('d', L[0].makeSVG().svg);
-
-        //results['one line'] = L.length === 1;
-        
-        L = L[0];
-        L.getTurns(true);
-        
-        results['correct size'] =
-        L.wide > prefs.minSize && L.wide < prefs.maxSize &&
-        L.high > prefs.minSize && L.high < prefs.maxSize;
-        
-        results['x 0 turn'] =
-        L.turns.x === 0;
-        
-        results['y 1 turn'] =
-        L.turns.y === 1;
-            
-        results['ends min'] =
-        (L.YYY[0] === L.yMin || L.YYY.at(-1) === L.yMin);
-        
-        results['1st near last'] =
-        abs(L.YYY[0] - L.YYY.at(-1)) < 10;
-
-        notes.innerHTML = '&nbsp;you:: ';
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
-
-    },
-
-    // # mark
-    has: d => {
-        
-        const L = linz(d);
-        let results = {};
-        
-        /*
-            ratLine.setAttribute('d',
-            L.map(_ => _.makeSVG().svg).join('')
-        );
-        */
-        
-        // there must be exactly four lines
-        if (L.length !== 4) {
-            notes.innerHTML = 'hash: 4 lines';
-            return false;
-        }
-        
-        const Vz = L.filter(LL =>
-            LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)
-        );
-        
-        const Hz = L.filter(LL =>
-            LL.YYY.every(y => abs(LL.YYY[0] - y) < 20)
-        );
-        
-        results['2 vert'] = Vz.length === 2;
-        results['2 horz'] = Hz.length === 2;
-        
-        if (!results['2 vert'] || !results['2 horz']) {
-            notes.innerHTML = 'hash: 2 hor/2 vert';
-            return;
-        }
-
-        const width  = abs(
-            max(Hz[0].xMax, Hz[1].xMax) -
-            min(Hz[0].xMin, Hz[1].xMin)
-        );
-        const height = abs(
-            max(Vz[0].yMax, Vz[1].yMax) -
-            min(Vz[0].yMin, Vz[1].yMin)
-        );
-        
-        const xMin = min(Vz[0].xMin, Vz[1].xMin);
-        const xMax = max(Vz[0].xMax, Vz[1].xMax);
-        const yMin = max(Vz[0].yMin, Vz[1].yMin);
-        const yMax = min(Vz[0].yMax, Vz[1].yMax);
-        
-        results['width'] = (
-            width  > prefs.minSize && width  < prefs.maxSize
-        );
-        
-        results['heighth'] = (
-            height > prefs.minSize && height < prefs.maxSize
-        );
-
-        results['cross y pos'] = (
-            Hz[0].yMax > yMin && Hz[0].yMax < yMax &&
-            Hz[1].yMax > yMin && Hz[1].yMax < yMax
-        );
-
-        results['cross x pos'] = (
-            Hz[0].xMin < xMin && Hz[0].xMax > xMax &&
-            Hz[1].xMin < xMin && Hz[1].xMax > xMax
-        );
-        
-        notes.innerHTML = '&nbsp;hash:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+': '+v+',&nbsp;'));
-        }
-        return(Object.values(results).every(v => v));
 
     },
 
@@ -1701,6 +1695,19 @@ const linz = (d, t=true) => {
     
      return d.map(D => new LineObj(D, t));
         
+};
+
+const hitz = (a, b) => {
+    
+    let p = [];
+    
+    a.coor.slice(1).some((ci, i) =>
+    b.coor.slice(1).some((cj, j) =>
+        p = crss([a.coor[i], ci, b.coor[j], cj])
+    ));
+    
+    return p;
+    
 };
 
 const mark = d => {
