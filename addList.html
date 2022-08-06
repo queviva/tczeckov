@@ -286,7 +286,8 @@ path {
 
 #ratPath {
     stroke: var(--lightness);
-    stroke-width: 1px;
+    stroke-width: 0.2px;
+    fill: none;
     marker-start: url(#dot);
     marker-mid: url(#dot);
     marker-end: url(#dot);
@@ -425,7 +426,7 @@ path {
 }
     
 </style>
-<script defer src="nanopicker.js"></script>
+<!--script defer src="nanopicker.js"></script-->
 </head>
 
 <body>
@@ -446,12 +447,12 @@ path {
     
     <div>
         
-    <div id="30" class="qr" data-czech="you">
+    <div id="30" class="qr" data-czech="par">
     &nbsp;
-    you&nbsp;&nbsp;&nbsp;&nbsp;shape
+    new paragraph:
     &nbsp;&nbsp;
     <b><i>
-        &#8255;
+        &#182;
     </i></b>&nbsp;</div>
      
     <div id="xiix" class="qr" data-czech="xix">
@@ -472,7 +473,7 @@ path {
          markerHeight="20"
          orient="auto"
         >
-            <circle id="dotdot" cx="10" cy="10" r="3"
+            <circle id="dotdot" cx="10" cy="10" r="1"
              vector-effect="non-scaling-size"
              fill="#c30"
              stroke="none"
@@ -498,7 +499,7 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g id="ratGroup" transform="translate(100 100)">
+    <g id="ratGroup" transform="translate(00 00)">
         <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
@@ -517,7 +518,9 @@ const fix = (...v) => console.log(v.map(x =>
     typeof x === 'number' ? x.toFixed(1) :
     typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
 ).join(' '));
-const clog = (...v) => (console.log(v), true);
+const clog = (...v) => (
+    //notes.innerHTML += v +' ',
+    console.log(...v), true);
 ////////////////////////////////////////////////////////}
 
 new function() {
@@ -1201,51 +1204,195 @@ const tests = {
         
     },
 
-    //}
-
     // u-shaped curve
     you: d => {
         
-        let L, Dn, Up;
+        let L;
         
         return (
             
             d.length === 1 &&
             
+            (d[0][0][0] < d[0].at(-1)[0] || d[0].reverse()) &&
+            
             (L = linz(d)[0].getTurns(true)) &&
         
             L.wide > prefs.minSize &&
             L.wide < prefs.maxSize &&
-            L.high > 0.2 * L.wide  &&
+            L.high > 0.1 * L.wide  &&
             
-            L.turns.x < 3 &&
+          //L.turns.x < 3 && !L.hasSelfXs() &&
+            L.turns.x === 0 &&
             L.turns.y === 1 &&
+            
+            L.XXX.at(-1) - L.XXX[0] > 0.8 * L.wide &&
             
            (L.YYY[0] === L.yMin || L.YYY.at(-1) === L.yMin) &&
             
-            abs(L.YYY[0] - L.YYY.at(-1)) < 0.3 * L.wide &&
+            abs(L.YYY[0] - L.YYY.at(-1)) < 0.2 * L.wide &&
             
-            (Dn = linz([
-                L.coor.slice(0, L.turns.yPts[0][2]),
+            linz([
+                L.coor.slice(0, L.turns.yPts[0][2] + 1),
                 L.coor.slice(   L.turns.yPts[0][2])
-            ])) &&
-            
-            Dn.every(LL => {
-                
-                LL.getAtOrig().org;
-                
-                return ((
-                    LL.coor[0][0] < LL.coor.at(-1)[0] ?
-                   -LL.org.xMin : LL.org.xMax)
-                    > 0.1 * LL.org.len
-                )
-                
-            })
+            ]).every((LL, i) => LL.getAtOrig().org.xMin < -1)
             
         );
 
     },
   
+    // werds reversed
+    rev: d => {
+        
+        let L, cent, A, B;
+        
+        return (
+            
+            d.length === 1 &&
+            
+            (d[0].at(-1)[0] > d[0][0][0] || d[0].reverse()) &&
+            
+            (L = linz(d)[0].getTurns(true)) &&
+            
+            L.wide > prefs.minSize &&
+            L.wide < 2 * prefs.maxSize &&
+            L.high > prefs.minSize &&
+            L.high < 2 * prefs.maxSize &&
+            
+            L.turns.x === 0 && L.turns.y === 2 &&
+            
+            L.turns.yPts.some(p => p[1] === L.yMin) &&
+            L.turns.yPts.some(p => p[1] === L.yMax) &&
+            
+            L.turns.yPts[1][0] - L.turns.yPts[0][0]
+            > 0.4 * L.wide &&
+            
+            abs(L.YYY[0]     - L.turns.yPts[0][1])
+            > 0.3 * L.high &&
+            
+            abs(L.YYY.at(-1) - L.turns.yPts[1][1])
+            > 0.3 * L.high
+            
+        );
+        
+    },
+   
+    // missing period
+    per: d => {
+        
+        let Dt, Cr;
+        
+        return (
+            
+            d.length === 2 &&
+            
+            ([Dt, Cr] = d.reduce((acc, c) => (acc[(
+                
+                c.length < 15 &&
+                c.slice(1).every(p =>
+                    abs(p[0] - c[0][0]) < 5 &&
+                    abs(p[1] - c[0][1]) < 5
+                )
+                    
+            )?0:1].push(new LineObj(c)),acc),[[],[]])) &&
+            Dt.length === 1 && Cr.length === 1 &&
+            
+            ([Dt, Cr] = [Dt, Cr].map(v =>
+                v[0].getTurns(true)
+            )) &&
+            
+            abs(Cr.XXX[0] - Cr.XXX.at(-1)) < 0.3 * Cr.wide &&
+            abs(Cr.YYY[0] - Cr.YYY.at(-1)) < 0.3 * Cr.high &&
+            
+            Cr.wide > prefs.minSize &&
+            Cr.wide < 2 * prefs.maxSize &&
+            Cr.high > prefs.minSize &&
+            Cr.high < 2 * prefs.maxSize &&
+            
+            Cr.wide / Cr.high > 0.7 &&
+            Cr.wide / Cr.high < 1.8 &&
+            
+            Cr.turns.x > 0 && Cr.turns.x < 3 &&
+            Cr.turns.y > 0 && Cr.turns.y < 4 &&
+            
+            abs(((Cr.xMin + Cr.xMax) / 2) - Dt.XXX[0])
+            < 0.2 * Cr.wide &&
+            abs(((Cr.yMin + Cr.yMax) / 2) - Dt.YYY[0])
+            < 0.2 * Cr.high &&
+            
+            true
+            
+        );
+        
+    },
+     
+    //}
+   
+   
+    // backwards-P paragraph
+    par: d => {
+        
+        let V, V1, V2, P, high;
+        
+        return (
+            
+            d.length === 3 &&
+            clog('3 lines') &&
+            
+            ([V, P] = d.reduce((acc, c) => (acc[(
+                
+                c.slice(1).every(p =>
+                    abs(p[0] - c[0][0]) < 20
+                )
+                    
+            )?0:1].push(new LineObj(c)),acc),[[],[]])) &&
+            V.length === 2 && P.length === 1 &&
+            clog('2 verts') &&
+            
+            (
+                [V1, V2, P] = [...V, P[0]].map(v =>
+                    v.getTurns(true)
+                ),
+                high = max(V1.yMax, V2.yMax) -
+                       min(V1.yMin, V2.yMin)
+            ) &&
+            clog('built') &&
+            
+            P.wide > prefs.minSize &&
+            P.wide < prefs.maxSize &&
+            high > prefs.minSize &&
+            high < prefs.maxSize &&
+            clog('size') &&
+            
+            abs(V1.yMin - V2.yMin) < 0.2 * high &&
+            abs(V1.yMax - V2.yMax) < 0.2 * high &&
+            clog('start|end') &&
+            
+            !hitz(V1, V2) &&
+            clog('no overlap') &&
+            
+            abs(P.yMin - V1.yMin) < 0.2 * high &&
+            clog('p top') &&
+            
+            abs(P.high - high / 2) < 0.3 * high &&
+            clog('p height') &&
+            
+            P.XXX[0] - max(V1.xMax, V2.xMax) > 5 &&
+            clog('p starts right') &&
+            
+            P.xMin < min(V1.xMin, V2.xMin) &&
+            clog('p extends left') &&
+        
+            P.XXX[0]     > P.xMin &&
+            P.XXX.at(-1) > P.xMin &&
+            clog('p dir') &&
+            
+            P.getTurns(true).turns.y < 3 && P.turns.x < 2
+            && clog('turns') &&
+            true
+        );
+       
+    },
+
     // still-do's {
     
     // x mark
@@ -1351,249 +1498,8 @@ const tests = {
         iSec.pt[0] - Up.xMin > 0.3 * wide
         iSec.pt[0] - Dn.xMin > 0.3 * wide;
 
-    },
-
-    // backwards-P paragraph
-    par: d => {
-        
-        const L = linz(d);
-        let results = {};
-
-        results['three lines'] = L.length === 3;
-        
-        if (!results['three lines']) {
-            notes.innerHTML = 'par: 3 lines';
-            return;
-        }
-        
-        const Vz = [], Pz = [];
-        
-        L.forEach(LL => {
-            if (LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)) {
-                Vz.push(LL);
-            } else {
-                Pz.push(LL);
-            }
-        });
-        
-        results['2 verts'] = Vz.length === 2;
-        
-        if (!results['2 verts']) {
-            notes.innerHTML = 'par: 2 vert';
-            return false;
-        }
-        
-        const width  = abs(Pz[0].xMax- Pz[0].xMin);
-        const height = max(Vz[0].yMax, Vz[1].yMax)
-                     - min(Vz[0].yMin, Vz[1].yMin);
-        
-        results['correct size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-        
-        results['same start y'] =
-        abs(Vz[0].yMin - Vz[1].yMin) < 20;
-        
-        results['same end y'] =
-        abs(Vz[0].yMax - Vz[1].yMax) < 20;
-        
-        results['no overlap'] =
-        abs(Vz[0].xMin - Vz[1].xMin) > 5;
-        
-        results['p starting y'] =
-        abs(Pz[0].yMin - Vz[0].yMin) < 20;
-        
-        results['p height'] =
-        abs((Pz[0].yMax - Pz[0].yMin) - height/2) <
-        0.2 * height;
-        
-        results['p starts right'] =
-        Pz[0].XXX[0] - max(Vz[0].xMax, Vz[1].xMax) > 5;
-        
-        results['p width'] =
-        Pz[0].xMax - Pz[0].xMin  >
-        2 * abs(Vz[0].xMin - Vz[1].xMin);
-        
-        results['p extends left'] =
-        Pz[0].xMin < min(Vz[0].xMin, Vz[1].xMin);
-        
-        results['p dir'] =
-        Pz[0].XXX[0] > Pz[0].xMin &&
-        Pz[0].XXX.at(-1) > Pz[0].xMin;
-        
-        results['y turns'] =
-        Pz[0].getTurns(true).turns.y < 3;
-        
-        results['x turns'] =
-        Pz[0].turns.x < 2;
-        
-        notes.innerHTML = '&nbsp;par:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += k +', ');
-        }
-        
-        return Object.values(results).every(v => v);
-       
-    },
-   
-    // missing period
-    per: d => {
-        
-        const L = linz(d);
-        let results = {};
-        
-        // must be precisely two lines
-        if (L.length !== 2) return false;
-        
-        L[0].getTurns(true);
-        
-                
-        const width  = abs(L[0].xMax - L[0].xMin);
-        const height = abs(L[0].yMax - L[0].yMin);
-        const cent = {
-            x: (L[0].xMin + L[0].xMax) / 2,
-            y: (L[0].yMin + L[0].yMax) / 2
-        };
-
-        results['size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-        
-        results['propotion'] =
-        width / height > 0.7 && width / height < 1.8;
-        
-        results['dot small'] =
-        L[1].XXX.length < 5;
-        
-        results['dot close'] =
-        L[1].XXX.slice(1).every((_, i) =>
-            abs(L[1].XXX[i+1] - L[1].XXX[i]) < 5 &&
-            abs(L[1].YYY[i+1] - L[1].YYY[i]) < 5
-        );
-        
-        results['x flex'] =
-        L[0].turns.x > 0 && L[0].turns.x < 3;
-        
-        results['y flex'] =
-        L[0].turns.y > 0 && L[0].turns.y < 4;
-        
-        results['start near end'] =
-        abs(L[0].XXX[0] - L[0].XXX.at(-1)) < 0.3 * width &&
-        abs(L[0].YYY[0] - L[0].YYY.at(-1)) < 0.3 * height;
-        
-        results['center dot'] =
-        abs(cent.x - L[1].XXX[0]) < 0.2 * width &&
-        abs(cent.y - L[1].YYY[0]) < 0.2 * height;
-        
-        notes.innerHTML = '&nbsp;per:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
-        
-    },
-    
-    // werds reversed
-    rev: d => {
-        
-        let L = linz(d);
-        let results = {};
-        
-        // must be one line
-        if (L.length !== 1) return false;
-        
-        L = L[0];
-        L.getTurns();
-        
-        //ratLine.setAttribute('d', L.makeSVG().svg);
-
-        /*
-        let tmp = ''; //{
-        if (L.turns.x) {
-            Q = L.turns.xPts;
-            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
-            
-            if (Q.length > 1) {
-                Q.slice(1).forEach(q =>
-                    tmp += 'L' + q[0] + ' ' + q[1]
-                );
-            }
-            
-        }
-        if (L.turns.y) {
-            Q = L.turns.yPts;
-            tmp += 'M' + Q[0][0] +' '+ Q[0][1] +'';
-            
-            if (Q.length > 1) {
-                Q.slice(1).forEach(q =>
-                    tmp += 'L' + q[0] + ' ' + q[1]
-                );
-            }
-            
-        }
-        if (L.turns.x || L.turns.y) {
-            ratPath.setAttribute('d', tmp);
-        }//}
-        */
-        
-        L.getTurns(true);
-        
-        if (L.turns.x !== 0 || L.turns.y !== 2) return false;
-        
-        notes.innerHTML = '';
-        
-        L.turns.xPts.forEach(p => {
-            notes.innerHTML +=
-                ' i: ' + p[2] +
-                ' >> ' + abs(L.XXX[0] - p[0]).toFixed(0) +
-                ', ' + abs(L.YYY[0] - p[1]).toFixed(0)
-        });
-        
-        const width  = abs(L.xMax - L.xMin);
-        const height = abs(L.yMax - L.yMin);
-        
-        let cent = {
-            x: (L.xMin + L.xMax) / 2,
-            y: (L.yMin + L.yMax) / 2,
-        };
-        cent.topQ = (L.yMin + cent.y) / 2;
-        cent.botQ = (L.yMax + cent.y) / 2;
-        
-        results['size'] =
-        width  > prefs.minSize && width  < prefs.maxSize &&
-        height > prefs.minSize && height < prefs.maxSize;
-        
-        results['proportion'] =
-        abs(L.turns.yPts[0][1] - L.turns.yPts[1][1]) > 0.8 * height;
-        
-        results['1st|end pos'] = (() => {
-            let [A, B] =
-            sign(L.YYY[0] - L.turns.yPts[0][1]) === 1 ?
-            [L.YYY[0], L.YYY.at(-1)]:
-            [L.YYY.at(-1), L.YYY[0]];
-            
-            return (
-                A > cent.y - 0.1 * height &&
-                A < L.yMax + 0.2 * height &&
-                B < cent.y + 0.1 * height &&
-                B > L.yMin - 0.2 * height
-            );
-            
-        })();
-        
-        notes.innerHTML = '&nbsp;rev:: ';
-        
-        for (let [k,v] of Object.entries(results)) {
-            v || (notes.innerHTML += (k+', '));
-        }
-        
-        return(Object.values(results).every(v => v));
-        
     }
-    
+
     //}
 
 };
