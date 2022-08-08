@@ -446,16 +446,12 @@ path {
     </div>
     
     <div>
+                
+    <div id="30" class="qr" data-czech="chx">
+    &nbsp;double werd werd:&nbsp;&nbsp;
+    <b><i>/</i></b>&nbsp;</div>
         
-    <div id="30" class="qr" data-czech="par">
-    &nbsp;
-    new paragraph:
-    &nbsp;&nbsp;
-    <b><i>
-        &#182;
-    </i></b>&nbsp;</div>
-     
-    <div id="xiix" class="qr" data-czech="xix">
+    <div id="3030" class="qr" data-czech="mrx">
     &nbsp;marx the spot:&nbsp;&nbsp;
     <b><i>&#215;</i></b>&nbsp;</div>
     
@@ -1325,9 +1321,6 @@ const tests = {
         
     },
      
-    //}
-   
-   
     // backwards-P paragraph
     par: d => {
         
@@ -1352,8 +1345,8 @@ const tests = {
                 [V1, V2, P] = [...V, P[0]].map(v =>
                     v.getTurns(true)
                 ),
-                high = max(V1.yMax, V2.yMax) -
-                       min(V1.yMin, V2.yMin)
+                high = max(V1.yMax, V2.yMax, P.yMax) -
+                       min(V1.yMin, V2.yMin, P.yMin)
             ) &&
             clog('built') &&
             
@@ -1393,113 +1386,68 @@ const tests = {
        
     },
 
+    //}
+   
+   
     // still-do's {
     
-    // x mark
-    OLDxix: d => {
+    // x-marx the spot
+    mrx: d => {
         
-        if (d.length !== 2) return false;
-        
-        const L = linz(d);
-        
-        let Up = L.filter(LL =>
-            LL.getSlopes().slopes.val.every(s => s < -0.2)
-        )[0];
-        
-        let Dn = L.filter(LL =>
-            LL.getSlopes().slopes.val.every(s => s >  0.2)
-        )[0];
-        
-        if (!Up || !Dn) return false;
+        let Up, Dn, pt;
         
         return (
+            d.length === 2 &&
             
-            Up.wide > prefs.minSize &&
-            Up.wide < prefs.maxSize &&
-            Dn.high > prefs.minSize &&
-            Dn.high < prefs.maxSize &&
+            ([Up, Dn] = linz(d).reduce((acc, LL) => {
+                
+                LL.getSlopes().getTurns(true)
+                .getAtOrig().org.getTurns(true);
             
-            crss([
-                Dn.coor[0], Dn.coor.at(-1),
-                Up.coor[0], Up.coor.at(-1)
-            ])
-        
+                if (
+                    LL.slopes.all
+                    < -0.2 && LL.slopes.all > -4.0
+                ) {
+                    acc[0].push(LL)
+                }
+                else if(
+                    LL.slopes.all
+                    >  0.2 && LL.slopes.all <  4.0
+                ) {
+                    acc[1].push(LL)
+                }
+            
+                return acc;
+                
+            },[[],[]])) &&
+            Up.length === 1 && Dn.length === 1 &&
+            (Up = Up[0], Dn = Dn[0]) &&
+            
+            [Up.org, Dn.org].every(LL =>
+                (LL.turns.x < 2 && LL.turns.y === 0) ||
+                LL.XXX.every(x => abs(x) < 5)
+            ) &&
+            
+            max(Up.wide, Dn.wide) < 2 * prefs.maxSize &&
+            max(Up.high, Dn.high) < 2 * prefs.maxSize &&
+            min(Up.org.len, Dn.org.len) /
+            max(Up.org.len, Dn.org.len) > 0.5 &&
+            
+            (pt = hitz(Up, Dn), pt) &&
+            
+            [Up.coor[0], Dn.coor[0]].every((c, i) => {
+                let dis = sqrt(
+                    (c[0] - pt[0]) ** 2 +
+                    (c[1] - pt[1]) ** 2
+                );
+                return dis > 0.3 * [Up, Dn][i].org.len &&
+                       dis < 0.7 * [Up, Dn][i].org.len
+            })
+            
         );
-
-    },
-    
-    // x mark
-    xix: d => {
         
-        if (d.length !== 2) return false;
-        
-        const L = linz(d);
-        let results = {};
-        
-        L.forEach(LL =>
-            LL.getSlopes().getTurns(true)
-            .getAtOrig().org.getTurns(true)
-        );
-        
-        const Up = L.filter(LL =>
-            LL.slopes.all < -0.2 && LL.slopes.all > -4.0
-        )[0];
-        
-        const Dn = L.filter(LL =>
-            LL.slopes.all >  0.2 && LL.slopes.all <  4.0
-        )[0];
-        
-        if (!Up || !Dn) {
-            notes.innerHTML = 'up dn';
-            return false;
-        }
-        
-        let iSec = {};
-        
-        Up.coor.slice(1).some((ci, i) =>
-            Dn.coor.slice(1).some((cj, j) =>
-                iSec.pt = crss([
-                    Up.coor[i], ci, Dn.coor[j], cj
-                ])
-            )
-        )
-        
-        if (!iSec.pt) return;
-            
-        const [wide, high] = [(
-            (iSec.xMax = max(...Up.XXX, ...Dn.XXX)) -
-            (iSec.xMin = min(...Up.XXX, ...Dn.XXX))),(
-            (iSec.yMax = max(...Up.YYY, ...Dn.YYY)) -
-            (iSec.yMin = min(...Up.YYY, ...Dn.YYY))
-        )];
-         
-        return (
-            
-            wide > prefs.minSize && wide < prefs.maxSize &&
-            high > prefs.minSize && high < prefs.maxSize &&
-            
-        (
-            (
-             (Up.org.turns.x < 2 && Up.org.turns.y === 0)||
-              Up.org.XXX.every(x => abs(x) < 5)
-            )&&(
-             (Dn.org.turns.x < 3 && Dn.org.turns.y === 0)||
-              Dn.org.XXX.every(x => abs(x) < 5)
-            )
-        ) &&
-            
-            abs(iSec.pt[0] - (iSec.xMin + wide / 2))
-            < 0.2 * wide &&
-            abs(iSec.pt[1] - (iSec.yMin + high / 2))
-            < 0.2 * high
-            
-        ) &&
-        
-        iSec.pt[0] - Up.xMin > 0.3 * wide
-        iSec.pt[0] - Dn.xMin > 0.3 * wide;
-
     }
-
+    
     //}
 
 };
