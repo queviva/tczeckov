@@ -447,13 +447,14 @@ path {
     
     <div>
                 
-    <div id="30" class="qr" data-czech="chx">
-    &nbsp;double werd werd:&nbsp;&nbsp;
-    <b><i>/</i></b>&nbsp;</div>
+    <div id="30" class="qr" data-czech="und">
+    &nbsp;under line:&nbsp;&nbsp;
+    <b><i>_</i></b>&nbsp;</div>
         
-    <div id="3030" class="qr" data-czech="mrx">
-    &nbsp;marx the spot:&nbsp;&nbsp;
-    <b><i>&#215;</i></b>&nbsp;</div>
+    <div id="30" class="qr" data-czech="pls">
+    &nbsp;plus sign:&nbsp;&nbsp;
+    <b><i>+</i></b>&nbsp;</div>
+        
     
     </div>
     
@@ -901,7 +902,7 @@ const tests = {
         return (
             
             d.length === 1 &&
-            (L = linz(d)[0].getTurns(true).getAtOrig()) &&
+            (L = linz(d)[0].getTurns(true)) &&
             L.wide > 20 && L.wide < 2 * prefs.maxSize &&
             L.high < 0.1 * L.wide &&
             L.turns.x === 0 && L.turns.y < 2
@@ -933,41 +934,6 @@ const tests = {
              
         );
 
-    },
-    
-    // + sign
-    pls: d => {
-        
-        let L, Vt, Hz;
-
-        return (
-            
-            d.length === 2 &&
-            
-            (L = linz(d),
-            
-            Vt = L.filter(LL =>
-                LL.XXX.every(x => abs(LL.XXX[0] - x) < 10)
-            )[0],
-            
-            Hz = L.filter(LL =>
-                LL.YYY.every(y => abs(LL.YYY[0] - y) < 10)
-            )[0],
-            
-            Vt && Hz) &&
-
-            Hz.wide > prefs.minSize &&
-            Hz.wide < prefs.maxSize &&
-            Vt.high > prefs.minSize &&
-            Vt.high < prefs.maxSize &&
-            
-            abs(Hz.yMax - Vt.yMin - Vt.high/2)
-            < 0.15 * Vt.high &&
-            
-            Hz.xMin < Vt.xMax && Vt.xMax < Hz.xMax
-            
-        );
-        
     },
     
     // two lines cross
@@ -1386,11 +1352,6 @@ const tests = {
        
     },
 
-    //}
-   
-   
-    // still-do's {
-    
     // x-marx the spot
     mrx: d => {
         
@@ -1446,8 +1407,77 @@ const tests = {
             
         );
         
-    }
+    },
     
+    //}
+    
+    // still-do's {
+    
+    // + sign
+    pls: d => {
+        
+        let Vt, Hz, pt, per;
+        
+        return (
+            
+            d.length === 2 &&
+            clog('2 lines') &&
+            
+            ([Vt, Hz] = linz(d).reduce((acc, LL) => {
+            
+                LL.getTurns(true);
+            
+                if (
+                    LL.high > 20 &&
+                    LL.high < 2 * prefs.maxSize &&
+                    LL.wide < 0.1 * LL.high &&
+                    LL.turns.y === 0 &&
+                    LL.turns.x < 2
+                ) {
+                    acc[0].push(LL)
+                }
+                else if (
+                    LL.wide > 20 &&
+                    LL.wide < 2 * prefs.maxSize &&
+                    LL.high < 0.1 * LL.wide &&
+                    LL.turns.x === 0 &&
+                    LL.turns.y < 2
+                ) {
+                    acc[1].push(LL)
+                }
+                return acc;
+            },[[],[]]), true) &&
+            clog('built') &&
+            
+            Vt.length === 1 && Hz.length === 1 &&
+            (Vt = Vt[0], Hz = Hz[0]) &&
+            clog('1 horz | 1 vert') &&
+            
+            clog(
+                'prop :::', perc(
+                    
+                min(Vt.high, Hz.wide) /
+                max(Vt.high, Hz.wide)
+                
+                )
+            ) &&
+            
+            (pt = hitz(Vt, Hz)) &&
+            clog('hitz') &&
+            
+            (Vt.per = abs(Vt.YYY[0] - pt[1]) / Vt.high) &&
+            0.3 < Vt.per && Vt.per < 0.7 &&
+            (Hz.per = abs(Hz.XXX[0] - pt[0]) / Hz.wide) &&
+            0.3 < Hz.per && Hz.per < 0.7 &&
+            clog('center hit') &&
+            
+            
+            true
+            
+        );
+        
+    }
+       
     //}
 
 };
