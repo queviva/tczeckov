@@ -447,14 +447,13 @@ path {
     
     <div>
                 
-    <div id="30" class="qr" data-czech="und">
-    &nbsp;under line:&nbsp;&nbsp;
-    <b><i>_</i></b>&nbsp;</div>
+    <div id="30" class="qr" data-czech="mrx">
+    &nbsp;marx the spot:&nbsp;&nbsp;
+    <b><i>&#215;</i></b>&nbsp;</div>
         
-    <div id="30" class="qr" data-czech="pls">
+    <div id="303" class="qr" data-czech="pls">
     &nbsp;plus sign:&nbsp;&nbsp;
     <b><i>+</i></b>&nbsp;</div>
-        
     
     </div>
     
@@ -516,7 +515,7 @@ const fix = (...v) => console.log(v.map(x =>
     typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
 ).join(' '));
 const clog = (...v) => (
-    //notes.innerHTML += v +' ',
+    notes.innerHTML += v +' ',
     console.log(...v), true);
 ////////////////////////////////////////////////////////}
 
@@ -848,7 +847,7 @@ Tczech.prototype.reprep = function () {
 
 const tests = {
     
-    // re-dones {
+    // {
 
     // {} nothing at all
     nun: d => false,
@@ -1108,11 +1107,10 @@ const tests = {
                     
             )) &&
             
-            L.slice(1).every(LL =>
-                !L[0].coor.slice(1).some((ci, i) =>
-                LL.coor.slice(1).some((cj, j) =>
-                crss([L[0].coor[i], ci, LL.coor[j], cj])
-            )))
+            !hitz(L[0], L[1]) &&
+            !hitz(L[0], L[2]) &&
+            !hitz(L[1], L[2])
+            
             
         );
         
@@ -1121,38 +1119,47 @@ const tests = {
     // # mark
     has: d => {
         
-        let L, Vt, Hz, wide, high;
+        let Vt, Hz;
         
         return (
             
             d.length === 4 &&
             
-            (
-                L = linz(d),
-                Vt = L.filter(LL =>
-                    LL.getTurns(true).turns.y === 0 &&
+            ([Vt, Hz] = linz(d).reduce((acc, LL) => {
+            
+                LL.getTurns(true);
+                acc[(
+                    
+                   (LL.turns.y === 0 &&
                     LL.turns.x < 2 &&
-                    LL.XXX.every(x => abs(LL.XXX[0] - x) < 20)
-                ),
-                Hz = L.filter(LL =>
-                    LL.turns.x === 0 &&
+                    LL.XXX.every(x => abs(LL.XXX[0]-x) < 20))
+                    ? 0 :
+            
+                   (LL.turns.x === 0 &&
                     LL.turns.y < 2 &&
-                    LL.YYY.every(y => abs(LL.YYY[0] - y) < 20)
-                )
-            ) &&
+                    LL.YYY.every(y => abs(LL.YYY[0]-y) < 20))
+                    ? 1 : 2
+                
+                )].push(LL);
+            
+                return acc;
+                
+            },[[],[],[]])) &&
             
             Vt.length === 2 && Hz.length === 2 &&
             
-            (wide = abs(
+            (Hz.wide = abs(
                 max(Hz[0].xMax, Hz[1].xMax) -
                 min(Hz[0].xMin, Hz[1].xMin)
-            ),high = abs(
+            ),Vt.high = abs(
                 max(Vt[0].yMax, Vt[1].yMax) -
                 min(Vt[0].yMin, Vt[1].yMin)
             )) &&
             
-            wide > prefs.minSize && wide < prefs.maxSize &&
-            high > prefs.minSize && high < prefs.maxSize &&
+            Hz.wide > prefs.minSize &&
+            Hz.wide < prefs.maxSize &&
+            Vt.high > prefs.minSize &&
+            Vt.high < prefs.maxSize &&
             
             hitz(Hz[0], Vt[0]) &&
             hitz(Hz[0], Vt[1]) &&
@@ -1175,17 +1182,16 @@ const tests = {
             
             d.length === 1 &&
             
-            (d[0][0][0] < d[0].at(-1)[0] || d[0].reverse()) &&
+           (d[0][0][0] < d[0].at(-1)[0] || d[0].reverse()) &&
             
-            (L = linz(d)[0].getTurns(true)) &&
+           (L = linz(d)[0].getTurns(true)) &&
+           
+            L.turns.x === 0 &&
+            L.turns.y === 1 &&
         
             L.wide > prefs.minSize &&
             L.wide < prefs.maxSize &&
             L.high > 0.1 * L.wide  &&
-            
-          //L.turns.x < 3 && !L.hasSelfXs() &&
-            L.turns.x === 0 &&
-            L.turns.y === 1 &&
             
             L.XXX.at(-1) - L.XXX[0] > 0.8 * L.wide &&
             
@@ -1205,7 +1211,7 @@ const tests = {
     // werds reversed
     rev: d => {
         
-        let L, cent, A, B;
+        let L;
         
         return (
             
@@ -1352,35 +1358,33 @@ const tests = {
        
     },
 
+    // }
+    
     // x-marx the spot
     mrx: d => {
         
         let Up, Dn, pt;
         
         return (
+            
             d.length === 2 &&
             
-            ([Up, Dn] = linz(d).reduce((acc, LL) => {
+            ([Up, Dn] = linz(d).reduce((acc, LL) => (
                 
                 LL.getSlopes().getTurns(true)
-                .getAtOrig().org.getTurns(true);
-            
-                if (
-                    LL.slopes.all
-                    < -0.2 && LL.slopes.all > -4.0
-                ) {
-                    acc[0].push(LL)
-                }
-                else if(
-                    LL.slopes.all
-                    >  0.2 && LL.slopes.all <  4.0
-                ) {
-                    acc[1].push(LL)
-                }
-            
-                return acc;
+                  .getAtOrig().org.getTurns(true),
                 
-            },[[],[]])) &&
+                acc[(
+                  LL.slopes.all < -0.2 && LL.slopes.all > -4.0
+                    ? 0 :
+                  LL.slopes.all >  0.2 && LL.slopes.all <  4.0
+                    ? 1 : 2
+                )].push(LL),
+                
+                acc
+                
+            ),[[],[],[]])) &&
+            
             Up.length === 1 && Dn.length === 1 &&
             (Up = Up[0], Dn = Dn[0]) &&
             
@@ -1394,7 +1398,7 @@ const tests = {
             min(Up.org.len, Dn.org.len) /
             max(Up.org.len, Dn.org.len) > 0.5 &&
             
-            (pt = hitz(Up, Dn), pt) &&
+            (pt = hitz(Up, Dn)) &&
             
             [Up.coor[0], Dn.coor[0]].every((c, i) => {
                 let dis = sqrt(
@@ -1409,19 +1413,15 @@ const tests = {
         
     },
     
-    //}
-    
-    // still-do's {
-    
+    // {
     // + sign
     pls: d => {
         
-        let Vt, Hz, pt, per;
+        let Vt, Hz, pt;
         
         return (
             
             d.length === 2 &&
-            clog('2 lines') &&
             
             ([Vt, Hz] = linz(d).reduce((acc, LL) => {
             
@@ -1430,7 +1430,7 @@ const tests = {
                 if (
                     LL.high > 20 &&
                     LL.high < 2 * prefs.maxSize &&
-                    LL.wide < 0.1 * LL.high &&
+                    LL.wide < 0.2 * LL.high &&
                     LL.turns.y === 0 &&
                     LL.turns.x < 2
                 ) {
@@ -1439,47 +1439,34 @@ const tests = {
                 else if (
                     LL.wide > 20 &&
                     LL.wide < 2 * prefs.maxSize &&
-                    LL.high < 0.1 * LL.wide &&
+                    LL.high < 0.2 * LL.wide &&
                     LL.turns.x === 0 &&
                     LL.turns.y < 2
                 ) {
                     acc[1].push(LL)
                 }
                 return acc;
-            },[[],[]]), true) &&
-            clog('built') &&
+            },[[],[]])) &&
             
             Vt.length === 1 && Hz.length === 1 &&
             (Vt = Vt[0], Hz = Hz[0]) &&
-            clog('1 horz | 1 vert') &&
             
-            clog(
-                'prop :::', perc(
-                    
-                min(Vt.high, Hz.wide) /
-                max(Vt.high, Hz.wide)
-                
-                )
-            ) &&
+            min(Vt.high, Hz.wide) / max(Vt.high, Hz.wide)
+            > 0.45 &&
             
             (pt = hitz(Vt, Hz)) &&
-            clog('hitz') &&
             
             (Vt.per = abs(Vt.YYY[0] - pt[1]) / Vt.high) &&
             0.3 < Vt.per && Vt.per < 0.7 &&
             (Hz.per = abs(Hz.XXX[0] - pt[0]) / Hz.wide) &&
-            0.3 < Hz.per && Hz.per < 0.7 &&
-            clog('center hit') &&
-            
-            
-            true
+            0.3 < Hz.per && Hz.per < 0.7
             
         );
         
     }
-       
-    //}
 
+    //}
+    
 };
 
 //}
@@ -1827,6 +1814,7 @@ addLiz('pointerup',     uppp, { passive: false });
 addLiz('pointercancel', uppp, { passive: false });
 
 //}
+
 
 }();
 
