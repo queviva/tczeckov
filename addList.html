@@ -447,9 +447,9 @@ path {
     
     <div>
                 
-    <div id="30" class="qr" data-czech="mrx">
-    &nbsp;marx the spot:&nbsp;&nbsp;
-    <b><i>&#215;</i></b>&nbsp;</div>
+    <div id="30" class="qr" data-czech="str">
+    &nbsp;five points:&nbsp;&nbsp;
+    <b><i>&#9957;</i></b>&nbsp;</div>
         
     <div id="303" class="qr" data-czech="pls">
     &nbsp;plus sign:&nbsp;&nbsp;
@@ -495,7 +495,7 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g id="ratGroup" transform="translate(00 00)">
+    <g id="ratGroup" transform="translate(100 100)">
         <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
@@ -515,7 +515,7 @@ const fix = (...v) => console.log(v.map(x =>
     typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
 ).join(' '));
 const clog = (...v) => (
-    notes.innerHTML += v +' ',
+    //notes.innerHTML += v +' ',
     console.log(...v), true);
 ////////////////////////////////////////////////////////}
 
@@ -543,7 +543,7 @@ const svg = document.getElementById('pad');
 let waiting = false;
 let compList = [];
 let coordList = [];
-const pi180 = 180 / Math.PI;
+const pi180 = 180 / Math.PI, pi2 = Math.PI / 2;
 const perc = v => Math.round(v*100) + '%';
 const min = Math.min;
 const max = Math.max;
@@ -621,7 +621,7 @@ function LineObj (d, filt=true) {
 
 }
 
-LineObj.prototype.getTurns = function (filt=false) {
+LineObj.prototype.getTurns = function (filt=true) {
 
     this.turns = {};
     
@@ -723,6 +723,7 @@ LineObj.prototype.getSelfXs = function () {
         if (p) this.crosses.push(
             {id1: i, id2: i+j+2, x: p[0], y: p[1]}
         );
+        
     
     })});
     
@@ -772,6 +773,29 @@ LineObj.prototype.getAtOrig = function (a=0, b=null) {
     this.org.len = pts.at(-1)[1];
     
     return this;
+
+};
+
+LineObj.prototype.getAtAngl = function (ang) {
+
+    let pts = this.coor.slice(0);
+    
+    let T = pi2 - ang;
+    
+    let cosT = cos(T);
+    let sinT = sin(T);
+
+    pts = pts.map(d => [
+        d[0] - pts[0][0],
+        d[1] - pts[0][1]
+    ]);
+
+    pts = pts.map(d => [
+        d[0] * cosT - d[1] * sinT,
+        d[0] * sinT + d[1] * cosT
+    ]);
+
+    return new LineObj(pts, false);
 
 };
 
@@ -864,7 +888,7 @@ const tests = {
             
             d.length === 1 &&
             
-            (L = linz(d, 0)[0].getTurns(true).getAtOrig()) &&
+            (L = linz(d, 0)[0].getTurns().getAtOrig()) &&
             
             L.wide < 10 &&
             L.high > 20 && L.high < 2 * prefs.maxSize &&
@@ -883,7 +907,7 @@ const tests = {
         return (
             
             d.length === 1 &&
-            (L = linz(d, 0)[0].getTurns(true).getAtOrig()) &&
+            (L = linz(d, 0)[0].getTurns().getAtOrig()) &&
             L.wide < 10 &&
             L.high > 20 && L.high < 2 * prefs.maxSize &&
             L.turns.x === 0 && L.turns.y === 0 &&
@@ -901,7 +925,7 @@ const tests = {
         return (
             
             d.length === 1 &&
-            (L = linz(d)[0].getTurns(true)) &&
+            (L = linz(d)[0].getTurns()) &&
             L.wide > 20 && L.wide < 2 * prefs.maxSize &&
             L.high < 0.1 * L.wide &&
             L.turns.x === 0 && L.turns.y < 2
@@ -919,7 +943,7 @@ const tests = {
             
             d.length === 1 &&
             
-            (L = linz(d)[0].getTurns(true).getSlopes()) &&
+            (L = linz(d)[0].getTurns().getSlopes()) &&
             
             L.wide > prefs.minSize &&
             L.wide < prefs.maxSize &&
@@ -960,7 +984,7 @@ const tests = {
             
             d.length === 1 &&
             
-            (L = linz(d)[0].getTurns(true).getSelfXs()) &&
+            (L = linz(d)[0].getTurns().getSelfXs()) &&
             
             L.turns.x === 2 &&
             L.turns.y === 1 &&
@@ -1010,7 +1034,7 @@ const tests = {
             
             (d[0].at(-1)[0] > d[0][0][0] || d[0].reverse()) &&
             
-            (L = linz(d)[0].getTurns(true)) &&
+            (L = linz(d)[0].getTurns()) &&
             
             L.turns.x < 2 && L.turns.y === 1 &&
                     
@@ -1049,7 +1073,7 @@ const tests = {
             
             d.length === 1 &&
             
-            (L = linz(d)[0].getSelfXs().getTurns(true)) &&
+            (L = linz(d)[0].getSelfXs().getTurns()) &&
             
             L.wide > 40 && L.wide < 2 * prefs.maxSize &&
             
@@ -1084,7 +1108,7 @@ const tests = {
             
             L[2].yMax - L[0].yMin < prefs.maxSize &&
             
-            L.every((LL, i) => ( LL.getTurns(true),
+            L.every((LL, i) => ( LL.getTurns(),
                 
                     LL.turns.x === 0 &&
                     LL.turns.y < 2 &&
@@ -1127,7 +1151,7 @@ const tests = {
             
             ([Vt, Hz] = linz(d).reduce((acc, LL) => {
             
-                LL.getTurns(true);
+                LL.getTurns();
                 acc[(
                     
                    (LL.turns.y === 0 &&
@@ -1172,6 +1196,98 @@ const tests = {
         );
         
     },
+    
+    //}
+    
+    str: d => {
+        
+        let L;
+        
+        return ((
+            
+            d.length === 1 &&
+            
+            (L = linz(d)[0].getTurns()) &&
+            
+            /*
+            (
+                
+            L.getSelfXs()) &&
+            L.turns.x === 3 && L.turns.y === 3 &&
+            L.crosses.length > 4 &&
+            L.crosses.length < 7
+            
+            ) || (
+            */
+            
+            (notes.innerHTML = 'more', true) &&
+            
+            (L.turns.first =
+                [...L.turns.xPts, ...L.turns.yPts]
+                .sort((a, b) => a[2] - b[2])[0]
+            ) &&
+            
+            (
+                L = new LineObj([
+                    L.coor[0],
+                    ...L.coor.slice(
+                    L.XXX.indexOf(L.turns.first[0]))
+                ]).getAtAngl(
+                    atan2(
+                        L.coor[0][1] - L.turns.first[1],
+                        L.coor[0][0] - L.turns.first[0]
+                    )
+                ).getTurns()
+            ) &&
+            
+            (
+                (L.turns.xPts[0][0] === L.coor[1][0] ||
+                L.turns.xPts.unshift(L.coor[1])),
+             
+                L.reCoor = [
+                    ...L.coor.slice(0,1),
+                    ...L.turns.xPts.map(v => [v[0], v[1]]),
+                    L.coor.at(-1)
+                ]
+            ) &&
+            L.reCoor.length === 6 &&
+            
+            (L = new LineObj(L.reCoor, false).getSelfXs()) &&
+            
+            L.crosses.length > 4 &&
+            L.crosses.length < 7
+            
+            /*
+            
+            &&
+            
+            (ratPath.setAttribute('d', L.makeSVG().svg),
+            true) &&
+            
+            (lipGroup.innerHTML = '',
+                L.crosses
+                .forEach(p => {
+                    let lip = document.createElementNS(NS,
+                    'ellipse');
+                    lip.setAttribute('cx', p.x);
+                    lip.setAttribute('cy', p.y);
+                    lip.setAttribute('rx', 3);
+                    lip.setAttribute('ry', 3);
+                    lip.setAttribute('fill', '#fb0');
+                    lipGroup.append(lip);
+                })
+            , true) &&
+            
+            false
+            */
+            
+            )
+            
+        );
+        
+    },
+    
+    //{
 
     // u-shaped curve
     you: d => {
@@ -1184,7 +1300,7 @@ const tests = {
             
            (d[0][0][0] < d[0].at(-1)[0] || d[0].reverse()) &&
             
-           (L = linz(d)[0].getTurns(true)) &&
+           (L = linz(d)[0].getTurns()) &&
            
             L.turns.x === 0 &&
             L.turns.y === 1 &&
@@ -1192,8 +1308,6 @@ const tests = {
             L.wide > prefs.minSize &&
             L.wide < prefs.maxSize &&
             L.high > 0.1 * L.wide  &&
-            
-            L.XXX.at(-1) - L.XXX[0] > 0.8 * L.wide &&
             
            (L.YYY[0] === L.yMin || L.YYY.at(-1) === L.yMin) &&
             
@@ -1219,7 +1333,7 @@ const tests = {
             
             (d[0].at(-1)[0] > d[0][0][0] || d[0].reverse()) &&
             
-            (L = linz(d)[0].getTurns(true)) &&
+            (L = linz(d)[0].getTurns()) &&
             
             L.wide > prefs.minSize &&
             L.wide < 2 * prefs.maxSize &&
@@ -1265,7 +1379,7 @@ const tests = {
             Dt.length === 1 && Cr.length === 1 &&
             
             ([Dt, Cr] = [Dt, Cr].map(v =>
-                v[0].getTurns(true)
+                v[0].getTurns()
             )) &&
             
             abs(Cr.XXX[0] - Cr.XXX.at(-1)) < 0.3 * Cr.wide &&
@@ -1315,7 +1429,7 @@ const tests = {
             
             (
                 [V1, V2, P] = [...V, P[0]].map(v =>
-                    v.getTurns(true)
+                    v.getTurns()
                 ),
                 high = max(V1.yMax, V2.yMax, P.yMax) -
                        min(V1.yMin, V2.yMin, P.yMin)
@@ -1351,15 +1465,13 @@ const tests = {
             P.XXX.at(-1) > P.xMin &&
             clog('p dir') &&
             
-            P.getTurns(true).turns.y < 3 && P.turns.x < 2
+            P.getTurns().turns.y < 3 && P.turns.x < 2
             && clog('turns') &&
             true
         );
        
     },
 
-    // }
-    
     // x-marx the spot
     mrx: d => {
         
@@ -1371,8 +1483,8 @@ const tests = {
             
             ([Up, Dn] = linz(d).reduce((acc, LL) => (
                 
-                LL.getSlopes().getTurns(true)
-                  .getAtOrig().org.getTurns(true),
+                LL.getSlopes().getTurns()
+                  .getAtOrig().org.getTurns(),
                 
                 acc[(
                   LL.slopes.all < -0.2 && LL.slopes.all > -4.0
@@ -1413,7 +1525,6 @@ const tests = {
         
     },
     
-    // {
     // + sign
     pls: d => {
         
@@ -1425,7 +1536,7 @@ const tests = {
             
             ([Vt, Hz] = linz(d).reduce((acc, LL) => {
             
-                LL.getTurns(true);
+                LL.getTurns();
             
                 if (
                     LL.high > 20 &&
@@ -1466,7 +1577,6 @@ const tests = {
     }
 
     //}
-    
 };
 
 //}
@@ -1509,7 +1619,7 @@ const crossCheck = new function () {
                 }
 
                 jCount++;
-                loop = setTimeout(check, 0);
+                loop = setTimeout(check, 500);
 
             }
             else {
