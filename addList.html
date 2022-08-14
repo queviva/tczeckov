@@ -451,9 +451,9 @@ path {
     &nbsp;five points:&nbsp;&nbsp;
     <b><i>&#9957;</i></b>&nbsp;</div>
         
-    <div id="303" class="qr" data-czech="pls">
-    &nbsp;plus sign:&nbsp;&nbsp;
-    <b><i>+</i></b>&nbsp;</div>
+    <div id="303" class="qr" data-czech="inf">
+    &nbsp;infinity symbol:&nbsp;&nbsp;
+    <b><i>&#8734;</i></b>&nbsp;</div>
     
     </div>
     
@@ -495,7 +495,7 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g id="ratGroup" transform="translate(100 100)">
+    <g id="ratGroup" transform="translate(100 140)">
         <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
@@ -869,6 +869,27 @@ Tczech.prototype.reprep = function () {
 
 // test methods {
 
+
+            /* //{
+            (ratPath.setAttribute('d', L.makeSVG().svg),
+            true) &&
+            
+            (lipGroup.innerHTML = '',
+                L.crosses
+                .forEach(p => {
+                    let lip = document.createElementNS(NS,
+                    'ellipse');
+                    lip.setAttribute('cx', p.x);
+                    lip.setAttribute('cy', p.y);
+                    lip.setAttribute('rx', 3);
+                    lip.setAttribute('ry', 3);
+                    lip.setAttribute('fill', '#fb0');
+                    lipGroup.append(lip);
+                })
+            , true) &&
+            
+            //}//*/
+          
 const tests = {
     
     // {
@@ -959,7 +980,7 @@ const tests = {
 
     },
     
-    // two lines cross
+    // two lines cross &#215;
     crs: d => {
         
         let L;
@@ -1023,7 +1044,7 @@ const tests = {
         
     },
 
-    // check box
+    // check box &#10003;
     chx: d => {
         
         let L, Dn, Up;
@@ -1064,11 +1085,11 @@ const tests = {
 
     },
         
-    // infinity symbol
+    // infinity symbol &#8734;
     inf: d => {
-    
+        
         let L;
-    
+        
         return (
             
             d.length === 1 &&
@@ -1088,6 +1109,9 @@ const tests = {
                 L.YYY[L.XXX.indexOf(L.xMin)]) / L.wide
             ) < 0.2 &&
             
+            //abs(L.XXX[0] - L.XXX.at(-1)) < 10 &&
+            //abs(L.YYY[0] - L.YYY.at(-1)) < 10 &&
+            
             0 < L.turns.x && L.turns.x < 3 &&
             2 < L.turns.y && L.turns.y < 5
             
@@ -1095,7 +1119,7 @@ const tests = {
     
     },
 
-    // triple underline
+    // triple underline &#8801;
     tri : d => {
         
         let L;
@@ -1199,97 +1223,74 @@ const tests = {
     
     //}
     
+    // * five point &#9957;
     str: d => {
         
         let L;
         
-        return ((
+        return (
             
             d.length === 1 &&
             
-            (L = linz(d)[0].getTurns()) &&
+            (L = linz(d)[0].getTurns().getSelfXs()) &&
             
-            /*
-            (
-                
-            L.getSelfXs()) &&
-            L.turns.x === 3 && L.turns.y === 3 &&
-            L.crosses.length > 4 &&
-            L.crosses.length < 7
-            
+            ((
+                L.turns.x === 3 &&
+                L.turns.y === 3 &&
+                L.crosses.length > 4 &&
+                L.crosses.length < 7
             ) || (
-            */
+                
+                (notes.innerHTML = 'more', true) &&
+               
+                (
+                    L.turns.first = [
+                        ...L.turns.xPts,
+                        ...L.turns.yPts
+                    ].sort((a, b) => a[2] - b[2])[0]
+                ) &&
             
-            (notes.innerHTML = 'more', true) &&
-            
-            (L.turns.first =
-                [...L.turns.xPts, ...L.turns.yPts]
-                .sort((a, b) => a[2] - b[2])[0]
-            ) &&
-            
-            (
-                L = new LineObj([
+                (L = new LineObj([
                     L.coor[0],
-                    ...L.coor.slice(
+                 ...L.coor.slice(
                     L.XXX.indexOf(L.turns.first[0]))
                 ]).getAtAngl(
                     atan2(
                         L.coor[0][1] - L.turns.first[1],
                         L.coor[0][0] - L.turns.first[0]
                     )
-                ).getTurns()
-            ) &&
-            
-            (
-                (L.turns.xPts[0][0] === L.coor[1][0] ||
-                L.turns.xPts.unshift(L.coor[1])),
-             
-                L.reCoor = [
-                    ...L.coor.slice(0,1),
-                    ...L.turns.xPts.map(v => [v[0], v[1]]),
-                    L.coor.at(-1)
-                ]
-            ) &&
-            L.reCoor.length === 6 &&
-            
-            (L = new LineObj(L.reCoor, false).getSelfXs()) &&
-            
-            L.crosses.length > 4 &&
-            L.crosses.length < 7
-            
-            /*
-            
-            &&
-            
-            (ratPath.setAttribute('d', L.makeSVG().svg),
-            true) &&
-            
-            (lipGroup.innerHTML = '',
-                L.crosses
-                .forEach(p => {
-                    let lip = document.createElementNS(NS,
-                    'ellipse');
-                    lip.setAttribute('cx', p.x);
-                    lip.setAttribute('cy', p.y);
-                    lip.setAttribute('rx', 3);
-                    lip.setAttribute('ry', 3);
-                    lip.setAttribute('fill', '#fb0');
-                    lipGroup.append(lip);
-                })
-            , true) &&
-            
-            false
-            */
-            
-            )
+                ).getTurns()) &&
+               
+                (
+                   (L.turns.xPts[0][0] === L.coor[1][0] ||
+                    L.turns.xPts.unshift(L.coor[1])),
+                    L.reCoor = [
+                     ...L.coor.slice(0,1),
+                     ...L.turns.xPts.map(v => [v[0], v[1]]),
+                        L.coor.at(-1)
+                    ]
+                ) &&
+                
+                L.reCoor.length === 6 &&
+                
+                (
+                    L = new LineObj(L.reCoor, false)
+                    .getSelfXs()
+                ) &&
+                
+                L.crosses.length > 4 &&
+                L.crosses.length < 7
+
+            ))
             
         );
         
     },
     
+    
     //{
 
-    // u-shaped curve
+    // u-shaped curve &#8746;
     you: d => {
         
         let L;
@@ -1322,7 +1323,7 @@ const tests = {
 
     },
   
-    // werds reversed
+    // werds reversed &#8767;
     rev: d => {
         
         let L;
@@ -1358,7 +1359,7 @@ const tests = {
         
     },
    
-    // missing period
+    // missing period &#9737;
     per: d => {
         
         let Dt, Cr;
@@ -1407,7 +1408,7 @@ const tests = {
         
     },
      
-    // backwards-P paragraph
+    // backwards-P paragraph &#182;
     par: d => {
         
         let V, V1, V2, P, high;
@@ -1472,7 +1473,7 @@ const tests = {
        
     },
 
-    // x-marx the spot
+    // x-marx the spot &#215;
     mrx: d => {
         
         let Up, Dn, pt;
@@ -1525,7 +1526,7 @@ const tests = {
         
     },
     
-    // + sign
+    // + sign &#43;
     pls: d => {
         
         let Vt, Hz, pt;
