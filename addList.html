@@ -1234,6 +1234,9 @@ const tests = {
             
             (L = linz(d)[0].getTurns().getSelfXs()) &&
             
+            L.wide < 2 * prefs.maxSize &&
+            L.high < 2 * prefs.maxSize &&
+            
             ((
                 L.turns.x === 3 &&
                 L.turns.y === 3 &&
@@ -1241,7 +1244,7 @@ const tests = {
                 L.crosses.length < 7
             ) || (
                 
-                (notes.innerHTML = 'more', true) &&
+                (notes.innerHTML = 'extra', true) &&
                
                 (
                     L.turns.first = [
@@ -1259,24 +1262,42 @@ const tests = {
                         L.coor[0][1] - L.turns.first[1],
                         L.coor[0][0] - L.turns.first[0]
                     )
-                ).getTurns()) &&
-               
+                ).getTurns(), L.turns.xPts.length > 0) &&
+                
                 (
                    (L.turns.xPts[0][0] === L.coor[1][0] ||
                     L.turns.xPts.unshift(L.coor[1])),
                     L.reCoor = [
                      ...L.coor.slice(0,1),
-                     ...L.turns.xPts.map(v => [v[0], v[1]]),
+                     ...L.turns.xPts
+                         .map(v => [v[0], v[1]]),
                         L.coor.at(-1)
                     ]
                 ) &&
                 
-                L.reCoor.length === 6 &&
+                L.reCoor.length > 5 &&
+                L.reCoor.length < 8 &&
                 
-                (
-                    L = new LineObj(L.reCoor, false)
-                    .getSelfXs()
+               (L = new LineObj(L.reCoor, 0).getSelfXs()) &&
+                
+                /*
+                (//{
+                    lipGroup.innerHTML = '',
+                    ratPath.setAttribute('d',L.makeSVG().svg),
+                    L.crosses.forEach((p, i) => {
+                        let lip = document.createElementNS(NS,
+                            'ellipse');
+                        lip.setAttribute('cx', p.x);
+                        lip.setAttribute('cy', p.y);
+                        lip.setAttribute('rx', 3);
+                        lip.setAttribute('ry', 3);
+                        lip.setAttribute('fill', '#fb0');
+                        lipGroup.append(lip);
+                    })
+                    , true //}
                 ) &&
+                */
+                
                 
                 L.crosses.length > 4 &&
                 L.crosses.length < 7
@@ -1286,7 +1307,6 @@ const tests = {
         );
         
     },
-    
     
     //{
 
@@ -1926,8 +1946,8 @@ addLiz('pointercancel', uppp, { passive: false });
 
 //}
 
-
 }();
+
 
 </script>
 
