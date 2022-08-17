@@ -2129,6 +2129,21 @@ addLiz('pointerdown',   down, { passive: false });
 addLiz('pointerup',     uppp, { passive: false });
 addLiz('pointercancel', uppp, { passive: false });
 
+addLiz('touchstart', e => {
+    e.stopPropagation(); e.preventDefault();
+    return false;
+});
+
+addLiz('touchmove', e => {
+    e.stopPropagation(); e.preventDefault();
+    return false;
+});
+
+addLiz('touchcancel', e => {
+    e.stopPropagation(); e.preventDefault();
+    return false;
+});
+
 //}
 
 }();
