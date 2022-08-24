@@ -1,0 +1,52 @@
+<!doctype html><html lang="en">
+
+<head><title>def app</title>
+<script src="defApp.js"
+ data-anything='
+    {"selector" : "pizza"}
+ '
+></script>
+</head>
+
+<body>
+    
+    <div id="pizza1" data-pizza>
+        this is the first objects
+    </div>
+    <div id="pizza2" data-pizza='{"zero":0,"one":1}'
+     style="
+        height: 200px;
+        width: 400px;
+        background-color: #ea0;
+     "
+    >
+        
+    </div>
+
+
+</body>
+
+<script>
+    
+pizza1.addEventListener('pizza-load', e => {
+    console.log('pizza1 loaded',e.detail);
+});
+
+pizza2.addEventListener('click', () => {
+    pizza2.dispatchEvent(new CustomEvent(
+        'tog-pizza'
+    ));
+});
+
+document.addEventListener('XXXpizza-load', e => {
+    console.log('page got loaded');
+    
+    let obj = e.detail;
+    console.log(
+        obj['1']
+    );
+})
+    
+</script>
+
+</html>

@@ -1,0 +1,382 @@
+<!doctype html lang="en"><html>
+
+<head><title>over line</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+<style id="demoStyles">
+
+@font-face {
+    font-family : luckiest;
+    src : url(luckiest.ttf);
+}
+
+* {
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+body {
+    
+    --nose-hsla: hsla(20, 40%, 100%, 0);
+    --nose-h: 20;
+    --nose-s: 40%;
+    --nose-l: 100%;
+    --nose-a: 0;
+    
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #666;
+    font-size: 22px;
+    text-align: justify;
+    hyphens: auto;
+        
+    --lightness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        var(--nose-l)
+    );
+    
+    --midness: hsl(
+        var(--nose-h),
+        calc(0.5 * var(--nose-s)),
+        calc(0.5 * var(--nose-l))
+    );
+    
+    --darkness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.35 * var(--nose-l))
+    );
+    
+    --blackness: hsl(
+        var(--nose-h),
+        var(--nose-s),
+        calc(0.20 * var(--nose-l))
+    );
+                
+    --main-color: var(--lightness);
+    --greyed-out: var(--darkness);
+    --back-color: #666;
+    --holder-back: #111;
+    
+    --trans-speed: 0.3s;
+
+    /* !!!MUST have spaces between -'s !!!
+    calc((var(--nose-l) - 30%)/(.8 - .3)) */
+    
+}
+
+.holder {
+	position: relative;
+    color: var(--main-color);
+    background-color: var(--holder-back);
+    margin: auto;
+    width: 100%;
+    max-width: 700px;
+    user-select: none;
+    touch-action: none;
+}
+
+a {
+    text-decoration: none;
+    color: var(--darkness);
+}
+
+a:hover, a:visited {
+    transition: color linear var(--trans-speed);
+    color: var(--darkness);
+}
+
+.qa > div > a, .qa > div  > a,
+.qb > div > a, .qb > div  > a,
+.qa > div > a:hover, .qa > div  > a:visited,
+.qb > div > a:hover, .qb > div> a:visited
+{
+    color: var(--lightness);
+}
+
+.qr > b {
+    color: var(--darkness);
+}
+
+.qa > div > b,
+.qb > div > b {
+    color: var(--lightness);
+}
+
+pre {
+    background-color: var(--midness);
+    margin: 0px;
+    padding: 10px;
+    color: var(--lightness);
+    overflow: auto;
+}
+
+hr {
+    border-top: 1px solid var(--blackness);
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    margin: 7px 0px 7px 0px;
+}
+
+.qr {
+    padding: 10px;
+}
+
+.qa:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.qa > div {
+    float: left;
+    padding: 10px;
+    height: auto;
+}
+
+.qa > div:nth-child(1) {
+  width: 65%;
+}
+
+.qa > div:nth-child(2) {
+  width: 35%;
+}
+
+.qb:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.qb > div {
+    float: left;
+    padding: 10px;
+    height: auto;
+}
+
+.qb > div:nth-child(1) {
+  width: 35%;
+}
+
+.qb > div:nth-child(2) {
+  width: 65%;
+}
+
+.qa, .qb {
+    color: var(--midness);
+}
+
+.mobr {
+    display: none;
+}
+
+.hobr {
+    display: inline-block;
+}
+
+.abhr {
+    display: none;
+}
+
+/*possibly a portrait mobi-fone*/
+@media screen and (max-width:500px) {
+
+	.qa > div:nth-child(1),
+	.qa > div:nth-child(2),
+	.qb > div:nth-child(1),
+	.qb > div:nth-child(2)
+	{
+    	width: 100%;
+    }
+    
+    .mobr {
+        display: inline-block;
+    }
+    .hobr {
+        display: none;
+    }
+    .abhr {
+        display: block;
+    }
+    ul {
+        text-align: left;
+    }
+    
+    #title {
+        font-size: 20px;
+    }
+
+}
+
+/*possibly a mobile landscraper*/
+@media screen and (orientation: landscape) and (max-width: 760px) {
+    
+}
+
+.signature {
+    text-align: right;
+    font-family: 'luckiest';
+    font-style: italic;
+    height: 200px;
+    -webkit-text-stroke: 1px var(--darkness);
+    color: var(--midness);
+    user-select: none;
+}
+
+
+</style>
+<style id="overStyle">
+
+svg {
+    --linesize: 4px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 50px;
+    width: 50px;
+    display: block;
+    float: left;
+    z-index: 200;
+    isolation: isolate;
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #fb0;
+    pointer-events: none;
+}
+
+.ratLine {
+    stroke: #fb0;
+    stroke-width: 15;
+    stroke-linecap: round;
+    fill: none;
+}
+
+</style>
+</head>
+
+<body>
+<div class="holder">
+    
+    <div class="qr" style="height: 200px;">
+        thease are the times that multiply men's souls
+    </div>
+    
+    <div id="test0" class="qr" style="
+        margin: auto;
+        height: 200px;
+        width: 70%;
+    ">
+        no, <i>these</i> are the times that
+        try men's soled shoes on for size
+    </div>
+    
+</div>
+</body>
+
+<script>
+////////////////////////////////////////////////////////{
+// pizzaface
+//
+const log = console.log;
+const fix = (...v) => console.log(v.map(x =>
+    typeof x === 'number' ? x.toFixed(1) :
+    typeof x === 'string' ? x.replace(/([\d\.-]+)/g,m=>Number(m).toFixed(1)) : x
+).join(' '));
+const clog = (...v) => (
+    //notes.innerHTML += v +' ',
+    console.log(...v), true);
+////////////////////////////////////////////////////////}
+
+    
+const NS = 'http://www.w3.org/2000/svg';
+
+let activeList = new Set();
+let coorList = [];
+const tczechList = [];
+
+const svg = document.createElementNS(NS, 'svg');
+
+svg.style.position = 'absolute';
+svg.style.top  = 0;
+svg.style.left = 0;
+    
+ratLine = document.createElementNS(NS, 'path');
+ratLine.classList.add('ratLine');
+svg.append(ratLine);
+        
+document.body.appendChild(svg);
+
+svg.addEventListener('pointerdown', e => {
+    log('svg down');
+    e.target.releasePointerCapture(e.pointerId);
+});
+
+ratLine.addEventListener('pointerdown', e => {
+    log('ratLine down');
+    e.target.releasePointerCapture(e.pointerId);
+});
+
+const Point = function (x, y) {
+    this.x = x;
+    this.y = y;
+    this.svg = this.x +' '+ this.y;
+};
+
+const draw = e => {
+    
+    coorList.push(new Point(e.pageX, e.pageY));
+    
+    ratLine.setAttribute('d', 'M'+ coorList[0].svg +
+        coorList.slice(1).map(c => 'L' + c.svg).join('')
+    );
+    
+}
+
+document.body.addEventListener('pointerdown', e => {
+    
+    log('down');
+    
+    e.target.releasePointerCapture(e.pointerId);
+    
+    coorList.push(new Point(e.pageX, e.pageY));
+    
+    document.body.addEventListener(
+        'pointermove', draw, { passive: false }
+    );
+    
+});
+    
+document.body.addEventListener('pointerup',   e => {
+    
+    log('uppp');
+    
+    coorList = [];
+
+    document.body.removeEventListener(
+        'pointermove', draw, { passive: false }
+    );
+    
+});
+    
+const test0 = document.getElementById('test0');
+
+const Tczech = function (obj) {
+    
+    this.obj = obj;
+    
+}
+
+tczechList.push(new Tczech(test0));
+
+    
+
+
+</script>
+
+</html>
+

@@ -264,7 +264,6 @@ svg {
     overflow: visible;
     padding: 0;
     margin: 0;
-    pointer-events: none;
 }
 
 path {
@@ -447,12 +446,13 @@ path {
     </div>
     
     <div>
-    <!--div id="30" class="qr" data-czech="hrt">
-    &nbsp;heart box:&nbsp;&nbsp;
-    <b><i>&#9825;</i></b>&nbsp;</div-->
+                
+    <div id="30" class="qr" data-czech="str">
+    &nbsp;five points:&nbsp;&nbsp;
+    <b><i>&#9957;</i></b>&nbsp;</div>
         
-    <div id="303" class="qr" data-czech="hhh">
-    &nbsp;four h club:&nbsp;&nbsp;
+    <div id="303" class="qr" data-czech="inf">
+    &nbsp;infinity symbol:&nbsp;&nbsp;
     <b><i>&#8734;</i></b>&nbsp;</div>
     
     </div>
@@ -495,7 +495,7 @@ path {
         <stop offset="80%" stop-color="#fb0" />
         </linearGradient>
     </defs>
-    <g id="ratGroup" transform="translate(00 00)">
+    <g id="ratGroup" transform="translate(100 140)">
         <g id="lipGroup"></g>
         <path id="ratLine" stroke="#c30"
         stroke-width="5"/>
@@ -516,8 +516,7 @@ const fix = (...v) => console.log(v.map(x =>
 ).join(' '));
 const clog = (...v) => (
     //notes.innerHTML += v +' ',
-    console.log(...v),
-true);
+    console.log(...v), true);
 ////////////////////////////////////////////////////////}
 
 new function() {
@@ -529,8 +528,7 @@ const prefs = {
     minSize : 10,
     maxSize : 150,
     penWidth : 8,
-    penTheta : -0.46,   // radians
-    pause : 1000,       // milliseconds
+    penTheta : -0.46, //radians
     rat: 'master'
 };
     
@@ -568,16 +566,16 @@ const ytra = sin(prefs.penTheta) * prefs.penWidth;
 // point object {
 
 function Point (x, y) {
-
+    
     this.x = x;
     this.y = y;
-
-    this.RtoL = (x + xtra) + ' ' + (y + ytra) + 'L' +
-                (x - xtra) + ' ' + (y - ytra);
-
-    this.LtoR = (x - xtra) + ' ' + (y - ytra) + 'L' +
-                (x + xtra) + ' ' + (y + ytra);
-
+    
+    this.RtoL = (x + xtra) +' '+ (y + ytra) + 'L' +
+                (x - xtra) +' '+ (y - ytra);
+    
+    this.LtoR = (x - xtra) +' '+ (y - ytra) + 'L' +
+                (x + xtra) +' '+ (y + ytra);
+    
 }
 
 //}
@@ -842,7 +840,7 @@ function Tczech (CZ) {
 
 Tczech.prototype.activate = function (v) {
     this.CZ[(v ? 'add' : 'remove') + 'EventListener'](
-        'pointermove', this.comp.bind(this), { once: true }
+        'touchmove', this.comp.bind(this), { once: true }
     );
 };
 
@@ -1136,9 +1134,9 @@ const tests = {
                     
             )) &&
             
-            !hitt(L[0], L[1]) &&
-            !hitt(L[0], L[2]) &&
-            !hitt(L[1], L[2])
+            !hitz(L[0], L[1]) &&
+            !hitz(L[0], L[2]) &&
+            !hitz(L[1], L[2])
             
             
         );
@@ -1190,10 +1188,10 @@ const tests = {
             Vt.high > prefs.minSize &&
             Vt.high < prefs.maxSize &&
             
-            hitt(Hz[0], Vt[0]) &&
-            hitt(Hz[0], Vt[1]) &&
-            hitt(Hz[1], Vt[0]) &&
-            hitt(Hz[1], Vt[1]) &&
+            hitz(Hz[0], Vt[0]) &&
+            hitz(Hz[0], Vt[1]) &&
+            hitz(Hz[1], Vt[0]) &&
+            hitz(Hz[1], Vt[1]) &&
             
             abs(Hz[0].yMax - Hz[1].yMax) > prefs.penWidth &&
             abs(Vt[0].xMax - Vt[1].xMax) > prefs.penWidth
@@ -1201,6 +1199,8 @@ const tests = {
         );
         
     },
+    
+    //}
     
     // * five point &#9957;
     str: d => {
@@ -1287,6 +1287,8 @@ const tests = {
         
     },
     
+    //{
+
     // u-shaped curve &#8746;
     you: d => {
         
@@ -1444,7 +1446,7 @@ const tests = {
             abs(V1.yMax - V2.yMax) < 0.2 * high &&
             clog('start|end') &&
             
-            !hitt(V1, V2) &&
+            !hitz(V1, V2) &&
             clog('no overlap') &&
             
             abs(P.yMin - V1.yMin) < 0.2 * high &&
@@ -1485,10 +1487,10 @@ const tests = {
                   .getAtOrig().org.getTurns(),
                 
                 acc[(
-                    LL.slopes.all < -0.2 &&
-                    LL.slopes.all > -4.0 ? 0 :
-                    LL.slopes.all >  0.2 &&
-                    LL.slopes.all <  4.0 ? 1 : 2
+                  LL.slopes.all < -0.2 && LL.slopes.all > -4.0
+                    ? 0 :
+                  LL.slopes.all >  0.2 && LL.slopes.all <  4.0
+                    ? 1 : 2
                 )].push(LL),
                 
                 acc
@@ -1508,7 +1510,7 @@ const tests = {
             min(Up.org.len, Dn.org.len) /
             max(Up.org.len, Dn.org.len) > 0.5 &&
             
-            (pt = hitt(Up, Dn)) &&
+            (pt = hitz(Up, Dn)) &&
             
             [Up.coor[0], Dn.coor[0]].every((c, i) => {
                 let dis = sqrt(
@@ -1522,269 +1524,6 @@ const tests = {
         );
         
     },
-    
-    //}
-    
-    // heart-shaped box &#9825;
-    hrt: d => {
-        
-        clearLips();
-        ratPathD('');
-        ratLineD('');
-        
-        let Lf, Rt;
-        
-        if (d.length === 1) {
-            
-            if (
-                false//dist(d[0][0], d[0].at(-1)) > 12
-            ) return false;
-            
-            let L = linz(d)[0];
-            
-            if (L.getSelfXs().crosses.length > 0) {
-            
-                if(L.crosses.length > 1) return false;
-                
-                L = new LineObj([
-                    [L.crosses[0].x, L.crosses[0].y],
-                  ...L.coor.slice(
-                     L.crosses[0].id1 + 1,
-                     L.crosses[0].id2 + 1),
-                    [L.crosses[0].x, L.crosses[0].y]
-                ]);
-            
-            }
-            
-            let yDex = (L.YYY.indexOf(L.yMax));
-            
-            if (yDex !== 0 && yDex !== L.coor.length -1) {
-            
-                L = new LineObj([
-                    ...L.coor.slice(yDex),
-                    ...L.coor.slice(0, yDex),
-                ])
-            
-            }
-           
-            L.getTurns();
-            
-            if (L.turns.y < 3) return false;
-            
-            d = [
-                L.coor.slice(0, L.turns.yPts[1][2] + 1),
-                [
-                 ...L.coor.slice(L.turns.yPts[1][2]),
-                    L.coor[0]
-                ]
-            ];
-            
-        }
-        
-        return (//{
-            
-            d.length === 2 &&
-            
-            (
-                [Lf, Rt] = linz(d)
-                .map(LL =>
-                    LL.coor[0][1] < LL.coor.at(-1)[1] ?
-                    new LineObj(LL.coor.reverse()) : LL
-                )
-                .sort((a, b) => a.xMin - b.xMin)
-            
-            ) &&
-            
-            /*
-            (ratPathD(Rt.makeSVG().svg+''+Lf.makeSVG().svg)
-            ,true) &&
-                        
-            (makeLips([
-                ...Lf.getTurns().turns.yPts,
-                ...Rt.getTurns().turns.yPts
-            ], '#fb0', 5), true) &&
-            
-            (makeLips([
-                ...Lf.getTurns().turns.xPts,
-                ...Rt.getTurns().turns.xPts
-            ], '#09f'), true) &&
-            //*/
-            
-            dist(Lf.coor[0], Rt.coor[0]) < 20 &&
-            dist(Lf.coor.at(-1), Rt.coor.at(-1)) < 20 &&
-            //clog('near') &&
-            
-            min(Lf.wide, Rt.wide) / max(Lf.wide, Rt.wide)
-            > 0.3 &&
-            Rt.xMax - Lf.xMin < 2 * prefs.maxSize &&
-            max(Lf.high, Rt.high) < 2 * prefs.maxSize &&
-            //clog('size') &&
-            
-            [Lf, Rt].every((LL, i) => {
-                
-                LL.getTurns();
-                
-                return (
-                    LL.turns.y === 1 &&
-                    LL.turns.yPts[0][1] < LL.coor.at(-1)[1] &&
-                    (
-                        LL.turns.x === 1 ||
-                        (
-                            LL.turns.x === 2 &&
-                            LL.turns.xPts[1][2] >
-                            LL.turns.yPts[0][2]
-                        )
-                    ) &&
-                    
-                    abs(
-                        LL.turns.xPts[0][0] -
-                        LL.turns.yPts[0][0]
-                    ) > 0.1 * LL.wide &&
-                    
-                    sign(LL.coor[0][0] - LL.turns.xPts[0][0])
-                    ===  [1, -1][i]
-                    
-                );
-                
-            }) &&
-            //clog('turns') &&
-            
-            abs(Lf.yMin - Rt.yMin) < 0.2 * Rt.high &&
-            //clog('top') &&
-            
-            //*
-            (linz([
-                Lf.coor.slice(
-                    Lf.turns.xPts[0][2],
-                    Lf.turns.yPts[0][2] + 1
-                ),
-                Lf.coor.slice(
-                    Lf.turns.yPts[0][2]
-                ),
-                Rt.coor.slice(
-                    Rt.turns.xPts[0][2],
-                    Rt.turns.yPts[0][2] + 1
-                ).reverse(),
-                Rt.coor.slice(
-                    Rt.turns.yPts[0][2]
-                ).reverse()
-            ]).every((LL, i) => {
-                
-                
-                let o = LL.getAtOrig().org
-                
-                o.coor[0][0] = 0;
-                
-                o.getTurns(false);
-                
-                ratPath.setAttribute('d',
-                    (ratPath.getAttribute('d')||'') +
-                    LL.makeSVG().svg
-                );
-                
-                makeLips(
-                    [LL.coor[0]],
-                    ['#f90','#090','#09f','#f0f'][i],
-                    3 + 1 * i
-                );
-                
-                log(o.turns.x, o.xMin);
-                
-                if (o.turns.x === 0 || o.turns.x > 3){
-                    ratLine.setAttribute('d',
-                        (ratLine.getAttribute('d') || '') +
-                        o.makeSVG().svg
-                    );
-                    log(o.coor);
-                }
-                
-                return (
-                    o.xMin == 0 &&
-                    ((
-                        o.turns.x > 0 && o.turns.x < 4
-                     )||(
-                        o.xMax > 3
-                    ))
-                );
-                
-            })) &&
-            //clog('curve') &&
-            //*/
-            
-            true
-            
-        );//}
-        
-    },
-    
-    // four h club
-    hhh : d => {
-        
-        clearLips();
-        let xxx = [];
-        
-        let H, C, idx;
-        
-        
-        return (
-            
-            d.length === 2 &&
-            
-            ([H, C] = linz(d).reduce((acc, LL) => (
-                acc[
-                    LL.getSelfXs().crosses.length === 2 ?
-                    0 : 1
-                ].push(LL), acc
-            ),[[],[]])) &&
-            
-            H.length === 1 && C.length === 1 &&
-            
-            (H = H[0].getTurns(), C = C[0], true) &&
-            
-            /*
-            (makeLips(H.turns.xPts, '#f0f', 7), true) &&
-            (makeLips(H.turns.yPts, '#0bb', 6), true) &&
-            */
-            (makeLips([H.crosses[0]], '#f0f', 5), true) &&
-            (makeLips([H.crosses[1]], '#fb0', 3), true) &&
-            
-            (makeLips(hitz(C,H),'#ff0',3)
-            ,true) &&
-            
-            (
-                xxx.push(H.coor[0]),
-                xxx.push(
-                    H.turns.xPts[0]||''
-                ),
-                idx = xxx[1][2]||'',
-                xxx.push(
-                    H.turns.yPts.find(p => p[2] > idx)||''
-                ),
-                idx = xxx[2][2]||'',
-                xxx.push(
-                    H.turns.yPts.find(p => p[2] > idx)||''
-                ),
-                idx = xxx[3][2]||'',
-                xxx.push(
-                    H.turns.xPts.find(p => p[2] > idx)||''
-                ),
-                xxx.push(H.coor.at(-1)),
-                true
-            ) &&
-            
-            xxx.every(p => p !== '')
-            
-            &&
-            (ratPathD(new LineObj([
-                xxx.map(c => [c[0], c[1]])
-            ],false).makeSVG().svg), true) &&
-            
-            true
-        );
-        
-    },
-
-    //{
     
     // + sign &#43;
     pls: d => {
@@ -1826,7 +1565,7 @@ const tests = {
             min(Vt.high, Hz.wide) / max(Vt.high, Hz.wide)
             > 0.45 &&
             
-            (pt = hitt(Vt, Hz)) &&
+            (pt = hitz(Vt, Hz)) &&
             
             (Vt.per = abs(Vt.YYY[0] - pt[1]) / Vt.high) &&
             0.3 < Vt.per && Vt.per < 0.7 &&
@@ -1931,25 +1670,6 @@ const crossCheck = new function () {
 
 // }
 
-// ellipse and line testing {
-
-const ratLineD = d => ratLine.setAttribute('d', d);
-const ratPathD = d => ratPath.setAttribute('d', d);
-const clearLips = () => lipGroup.innerHTML = '';
-const makeLips = (d, col='#fb0', rad=3) => {
-    d.forEach(c => {
-        let lip = document.createElementNS(NS, 'ellipse');
-        lip.setAttribute('cx', c[0] || c.x || 0);
-        lip.setAttribute('cy', c[1] || c.y || 0);
-        lip.setAttribute('rx', rad);
-        lip.setAttribute('ry', rad);
-        lip.setAttribute('fill', col);
-        lipGroup.append(lip);
-    });
-};
-    
-//}
-
 // app methods {
 
 const linz = (d, t=true) => {
@@ -1958,7 +1678,7 @@ const linz = (d, t=true) => {
         
 };
 
-const hitt = (a, b) => {
+const hitz = (a, b) => {
     
     let p = [];
     
@@ -1969,53 +1689,6 @@ const hitt = (a, b) => {
     
     return p;
     
-};
-
-const hitz = (a, b) => {
-    
-    let h = [];
-    
-    a.coor.slice(1).forEach((ci, i) =>
-    b.coor.slice(1).forEach((cj, j) => {
-        let p = crss([a.coor[i], ci, b.coor[j], cj]);
-        if (p) h.push({
-            x: p[0],
-            y: p[1],
-            id1: i,
-            id2: j
-        });
-    }));
-    
-    return h;
-    
-};
-
-const dist = (a, b) => {
-    
-    return sqrt(
-        (a[1] - b[1]) ** 2 +
-        (a[0] - b[0]) ** 2
-    )
-    
-};
-
-const crss = h => {
-
-    if (h.length < 4) return false;
-
-    //* foxxy method *//
-    let [a, b, c, d, p, q, r, s] = [...h.flat()];
-    
-    let det = (c - a) * (s - q) - (r - p) * (d - b), gam, lam;
-    
-    if (det === 0) return false;
-    
-    lam = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
-    gam = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
-    
-    return ((0 < lam && lam < 1) && (0 < gam && gam < 1)) ?
-    [a + lam * (c - a), b + lam * (d - b)] : false;
-
 };
 
 const mark = d => {
@@ -2053,15 +1726,41 @@ const mark = d => {
 
 };
 
+const crss = h => {
+
+    if (h.length < 4) return false;
+
+    //* foxxy method *//
+    let [a, b, c, d, p, q, r, s] = [...h.flat()];
+
+    let det = (c - a) * (s - q) - (r - p) * (d - b), gam, lam;
+    
+    if (det === 0) return false;
+    
+    lam = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+    gam = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+    
+    return ((0 < lam && lam < 1) && (0 < gam && gam < 1)) ?
+    [a + lam * (c - a), b + lam * (d - b)] : false;
+
+};
+
 const draw = e => {
+    
 
     e.preventDefault();
     e.stopPropagation();
     
+    e = e.touches[0];
+    const remove = new Point(e.pageX, e.pageY);
+    log(remove);
+    
+    /*
     if (
         e.pageX === coordList.at(-1).at(-1).x &&
         e.pageY === coordList.at(-1).at(-1).y
     ) return;
+    */
     
     coordList.at(-1).push(new Point(e.pageX, e.pageY));
     
@@ -2114,9 +1813,9 @@ const draw = e => {
 const down = e => {
     
     //e.preventDefault();
-    e.target.releasePointerCapture(e.pointerId);
-
     notes.innerHTML = '&nbsp;';
+    
+    log('touch down');
 
     if (e.pageX > 0.8 * document.body.offsetWidth) {
         waiting = clearTimeout(waiting);
@@ -2147,7 +1846,9 @@ const down = e => {
         (new Point(e.pageX, e.pageY))
     );
 
-    addLiz('pointermove', draw, { passive: false });
+    addLiz('touchmove', draw, { passive: false });
+
+    //e.target.releasePointerCapture(e.pointerId);
 
 };
 
@@ -2155,12 +1856,13 @@ const uppp = e => {
     
     //e.preventDefault();
     //e.stopPropagation();
+    log(e.pointerId);
     
     let path = svg.lastChild;
     
     if (!path) return;
     
-    remLiz('pointermove', draw, {passive:false});
+    remLiz('touchmove', draw, {passive:false});
 
     for (let i in this) {
         if (!this[i].completed) {
@@ -2168,7 +1870,7 @@ const uppp = e => {
         }
     }
 
-    waiting = setTimeout(exam, prefs.pause);
+    waiting = setTimeout(exam, 1000);//600);
 
 };
 
@@ -2227,9 +1929,12 @@ document.querySelectorAll('[data-czech]').forEach((CZ, i) =>
 
 // add lizzers {
 
-addLiz('pointerdown',   down, { passive: false });
-addLiz('pointerup',     uppp, { passive: false });
-addLiz('pointercancel', uppp, { passive: false });
+addLiz('touchstart',   down, { passive: false });
+addLiz('touchup',     uppp, { passive: false });
+addLiz('touchcancel', uppp, { passive: false });
+addLiz('lostpointercapture', e => {
+    log('lost capture');
+}, { passive: false });
 
 //}
 

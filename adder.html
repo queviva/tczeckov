@@ -1,0 +1,157 @@
+<html>
+    
+<head><title>adder</title>
+
+<style>
+*{
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+svg {
+    --linesize: 4px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 50px;
+    width: 50px;
+    display: block;
+    float: left;
+    z-index: 200;
+    isolation: isolate;
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+}
+
+path {
+    fill: none;
+    stroke-width: var(--linesize);
+    stroke-linecap: round;
+    stroke: var(--lightness, #f0f);
+    transition: opacity linear 400ms;
+}
+
+#list {
+    position: relative;
+    line-height: 100px;
+    margin: 0;
+    padding: 0;
+}
+
+div {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  list-style: none;
+  xbackground: #d1703c;
+  color: #000;
+  height: 0;
+  line-height: 40px;
+  margin: 0px;
+  padding: 5px;
+  overflow: hidden;
+  width: 100%;
+  transition: all cubic-bezier(0.27, 0, 0.37, 4.8) 400ms;
+}
+
+div.show {
+  height: 50px;
+  margin: 0;
+  padding: 5px;
+  transition: all cubic-bezier(0.27, 0, 0.3, 4.8) 400ms;
+}
+
+#adder {
+    font-family: georgia;
+    font-size: 50px;
+    font-style: italic;
+    color: #fff;
+    background-color: #fb0;
+    padding-left: 15px;
+}
+
+#adder::placeholder {
+    text-align: center;
+    font-style: italic;
+    color: #fff;
+    opacity: 0.5;
+}
+
+    
+</style>
+</head>
+
+<body>
+<div id="list">
+  <div class="show" style="text-align:center;">tczechov</div>
+  
+  <div id="addDiv" class="show">
+      <input id="adder" type="text"
+       placeholder="add item"
+       style="width: 100%"
+      >
+  </div>
+</div>
+</body>
+
+<script>
+const list = document.getElementById('list');
+const adder = document.getElementById('adder');
+
+    
+const addListItem = name => {
+  let newDiv = document.createElement('div');
+  newDiv.setAttribute('id', Date.now());
+  newDiv.innerHTML = name;
+  
+  newDiv.addEventListener('click', e => {
+      console.log(newDiv.classList);
+      newDiv.style.left = '30px';
+      newDiv.style.top = '10px';
+      list.addEventListener('transitionend', e => {
+          
+          newDiv.classList.remove('show');
+          
+          newDiv.addEventListener('transitionend', e => {
+            list.removeChild(newDiv);
+          }, {once: true})
+      }, { once: true });
+      
+  }, {once: true});
+  
+  list.insertBefore(
+      newDiv,
+      addDiv
+  );
+  
+  setTimeout(function() {
+      newDiv.classList.add('show');
+  }, 10);
+  
+}
+
+  list.addEventListener('transitionend', e => {
+      if (e.propertyName === 'height') {
+          console.log('height trans',e.srcElement);
+      }
+  });
+  
+  adder.addEventListener('keydown', e => {
+      if (e.code === 'Enter') {
+          addListItem(
+              adder.value
+              .replace(/[^a-zA-Z0-9 \.'&+-]/g,'')
+          );
+          adder.value = '';
+      }
+  });
+
+
+</script>
+
+</html>
